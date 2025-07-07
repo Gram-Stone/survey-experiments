@@ -46,7 +46,7 @@ const responseSchema = new mongoose.Schema({
   },
   readabilityRating: {
     type: Number,
-    required: true,
+    required: false,
     min: 1,
     max: 5
   },

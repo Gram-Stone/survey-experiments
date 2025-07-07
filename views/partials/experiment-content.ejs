@@ -10,7 +10,7 @@
     
     <div class="scenario-description">
         <p><%= experiment.instructions || 'Please read the following scenario carefully and choose the option you would prefer:' %></p>
-        <% if (attributionCondition === 'present' && fontCondition === 'hard') { %>
+        <% if (typeof attributionCondition !== 'undefined' && attributionCondition === 'present' && fontCondition === 'hard') { %>
             <p class="attribution-note"><em>Note: This information may be difficult to read because of the font.</em></p>
         <% } %>
     </div>
@@ -28,7 +28,7 @@
                     <div class="option-box">
                         <label for="option<%= option.id %>" class="option-label">
                             <input type="radio" id="option<%= option.id %>" name="choice" value="<%= option.id %>">
-                            <div class="option-content <%= fontCondition %>-font">
+                            <div class="option-content <%= option.fontClass || (fontCondition + '-font') %>">
                                 <h4><%= option.label %></h4>
                                 <% option.content.forEach(function(line) { %>
                                     <p><%= line %></p>
@@ -42,7 +42,7 @@
                     <div class="option-box defer-option">
                         <label for="optionDefer" class="option-label">
                             <input type="radio" id="optionDefer" name="choice" value="DEFER">
-                            <div class="option-content <%= fontCondition %>-font">
+                            <div class="option-content <%= option.fontClass || (fontCondition + '-font') %>">
                                 <h4><%= experiment.deferText.label %></h4>
                                 <% experiment.deferText.content.forEach(function(line) { %>
                                     <p><%= line %></p>

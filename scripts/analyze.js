@@ -324,25 +324,27 @@ async function analyzeExperiment(experimentId) {
     });
   }
 
-  // Manipulation check (readability ratings)
-  const ratingsData = data.filter(r => r.readabilityRating);
-  if (ratingsData.length > 0) {
-    console.log('\n--- MANIPULATION CHECK ---');
-    const readabilityByFont = {};
-    
-    ratingsData.forEach(response => {
-      const font = response.fontCondition || 'unknown';
-      if (!readabilityByFont[font]) readabilityByFont[font] = [];
-      readabilityByFont[font].push(response.readabilityRating);
-    });
+  // Manipulation check (readability ratings) - only for font-pretest experiment
+  if (experimentId === 'font-pretest') {
+    const ratingsData = data.filter(r => r.readabilityRating);
+    if (ratingsData.length > 0) {
+      console.log('\n--- MANIPULATION CHECK ---');
+      const readabilityByFont = {};
+      
+      ratingsData.forEach(response => {
+        const font = response.fontCondition || 'unknown';
+        if (!readabilityByFont[font]) readabilityByFont[font] = [];
+        readabilityByFont[font].push(response.readabilityRating);
+      });
 
-    Object.keys(readabilityByFont).forEach(font => {
-      const ratings = readabilityByFont[font];
-      if (ratings.length > 0) {
-        const stats = calculateStats(ratings);
-        console.log(`${font} readability: M=${stats.mean.toFixed(2)}, SD=${stats.stdDev.toFixed(2)}, n=${stats.n}`);
-      }
-    });
+      Object.keys(readabilityByFont).forEach(font => {
+        const ratings = readabilityByFont[font];
+        if (ratings.length > 0) {
+          const stats = calculateStats(ratings);
+          console.log(`${font} readability: M=${stats.mean.toFixed(2)}, SD=${stats.stdDev.toFixed(2)}, n=${stats.n}`);
+        }
+      });
+    }
   }
 
   // Sample size recommendations

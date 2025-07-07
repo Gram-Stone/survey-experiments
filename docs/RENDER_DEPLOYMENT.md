@@ -43,7 +43,7 @@ Add these in the Environment section:
 **Required:**
 ```
 NODE_ENV=production
-MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@your-cluster.mongodb.net/pilot-study?retryWrites=true&w=majority&appName=your-cluster
+MONGODB_URI=[your-complete-mongodb-atlas-connection-string]
 SESSION_SECRET=[Generate random 32+ character string]
 ```
 

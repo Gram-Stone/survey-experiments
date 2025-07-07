@@ -71,17 +71,19 @@ router.get('/', async (req, res) => {
     return res.render('preview', { workerId, assignmentId, hitId });
   }
 
-  // Randomly assign font condition and attribution condition
-  const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-  const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
-
   // Store in session
   req.session.workerId = workerId;
   req.session.assignmentId = assignmentId;
   req.session.hitId = hitId;
-  req.session.fontCondition = fontCondition;
-  req.session.attributionCondition = attributionCondition;
   req.session.startTime = new Date();
+
+  // Only assign font/attribution conditions for fluency manipulation experiments
+  if (experiment !== 'font-pretest') {
+    const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+    const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+    req.session.fontCondition = fontCondition;
+    req.session.attributionCondition = attributionCondition;
+  }
 
   res.render('landing', { 
     workerId, 
@@ -174,43 +176,14 @@ router.post('/demographics', (req, res) => {
   
   req.session.age = parseInt(age);
   req.session.education = education;
-  res.redirect('/check');
-});
-
-// Manipulation check page
-router.get('/check', (req, res) => {
-  if (!req.session.workerId || !req.session.choice || !req.session.age) {
-    return res.redirect('/');
-  }
-  
-  res.render('check', { 
-    fontCondition: req.session.fontCondition 
-  });
-});
-
-// Handle manipulation check form submission
-router.post('/check', (req, res) => {
-  if (!req.session.workerId || !req.session.choice || !req.session.age) {
-    return res.redirect('/');
-  }
-  
-  const { readabilityRating } = req.body;
-  
-  if (!readabilityRating || readabilityRating < 1 || readabilityRating > 5) {
-    return res.render('check', { 
-      fontCondition: req.session.fontCondition,
-      error: 'Please provide a rating between 1 and 5.'
-    });
-  }
-  
-  req.session.readabilityRating = parseInt(readabilityRating);
   res.redirect('/complete');
 });
+
 
 // Completion page
 router.get('/complete', async (req, res) => {
   if (!req.session.workerId || !req.session.choice || 
-      !req.session.age || !req.session.readabilityRating) {
+      !req.session.age) {
     return res.redirect('/');
   }
   
@@ -229,7 +202,6 @@ router.get('/complete', async (req, res) => {
       choice: req.session.choice,
       age: req.session.age,
       education: req.session.education,
-      readabilityRating: req.session.readabilityRating,
       completionCode: completionCode,
       ipAddress: getClientIP(req)
     });
