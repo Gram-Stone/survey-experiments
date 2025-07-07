@@ -89,7 +89,7 @@ router.get('/', async (req, res) => {
     workerId, 
     assignmentId, 
     hitId, 
-    fontCondition 
+    fontCondition: req.session.fontCondition 
   });
 });
 

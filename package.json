@@ -1,5 +1,5 @@
 {
-  "name": "font-fluency-pilot",
+  "name": "survey-experiments",
   "version": "1.0.0",
   "description": "Font fluency and Allais paradox experiment pilot study",
   "type": "module",
@@ -15,12 +15,12 @@
     "export:novemsky": "node scripts/analyze.js --experiment=novemsky2007 --export"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^5.1.0",
     "express-session": "^1.18.1",
-    "mongoose": "^7.5.0",
+    "mongoose": "^8.16.2",
     "ejs": "^3.1.10",
-    "helmet": "^7.0.0",
-    "dotenv": "^16.3.1"
+    "helmet": "^8.1.0",
+    "dotenv": "^17.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
