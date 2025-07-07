@@ -59,10 +59,17 @@ router.get('/', async (req, res) => {
     });
   }
   
-  // Validate AMT parameters
+  // Validate AMT parameters (allow preview mode)
   if (!workerId || !assignmentId || !hitId) {
-    return res.render('error', { 
-      message: 'This study requires Amazon Mechanical Turk parameters. Please access through MTurk.' 
+    // Allow preview access with default parameters
+    const previewWorkerId = 'PREVIEW_WORKER';
+    const previewAssignmentId = 'ASSIGNMENT_ID_NOT_AVAILABLE';
+    const previewHitId = 'PREVIEW_HIT';
+    
+    return res.render('preview', { 
+      workerId: previewWorkerId, 
+      assignmentId: previewAssignmentId, 
+      hitId: previewHitId 
     });
   }
 
