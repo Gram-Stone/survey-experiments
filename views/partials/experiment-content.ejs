@@ -10,7 +10,7 @@
     
     <div class="scenario-description">
         <p><%= experiment.instructions || 'Please read the following scenario carefully and choose the option you would prefer:' %></p>
-        <% if (typeof attributionCondition !== 'undefined' && attributionCondition === 'present' && fontCondition === 'hard') { %>
+        <% if (typeof attributionCondition !== 'undefined' && attributionCondition === 'present') { %>
             <p class="attribution-note"><em>Note: This information may be difficult to read because of the font.</em></p>
         <% } %>
     </div>
