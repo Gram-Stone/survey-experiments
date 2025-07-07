@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Fluency Experiment - Demographics</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Psychology Research Study</h1>
+        </header>
+        
+        <main>
+            <div class="demographics-section">
+                <h2>Background Information</h2>
+                
+                <% if (typeof error !== 'undefined') { %>
+                    <div class="error-message">
+                        <%= error %>
+                    </div>
+                <% } %>
+                
+                <div class="form-description">
+                    <p>Please provide some basic information about yourself. This information helps us understand our study participants and is kept completely confidential.</p>
+                </div>
+                
+                <form method="POST" action="/demographics">
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" min="18" max="120" required>
+                        <small>You must be at least 18 years old to participate.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="education">Highest level of education completed:</label>
+                        <select id="education" name="education" required>
+                            <option value="">Please select...</option>
+                            <option value="high_school">High school or equivalent</option>
+                            <option value="some_college">Some college or associate degree</option>
+                            <option value="bachelors">Bachelor's degree</option>
+                            <option value="masters">Master's degree</option>
+                            <option value="doctorate">Doctoral degree (PhD, MD, JD, etc.)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button type="submit" class="btn btn-primary">Continue</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+        <footer>
+            <p>This study is conducted by researchers at [University Name]. All responses are confidential.</p>
+        </footer>
+    </div>
+</body>
+</html>

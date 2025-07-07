@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Fluency Experiment</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Psychology Research Study</h1>
+        </header>
+        
+        <main>
+            <div class="welcome-section">
+                <h2>Welcome to Our Research Study</h2>
+                <p>Thank you for participating in our psychology research study. This study examines decision-making processes and should take approximately 5-10 minutes to complete.</p>
+                
+                <div class="study-info">
+                    <h3>What You'll Do:</h3>
+                    <ul>
+                        <li>Read brief instructions</li>
+                        <li>Answer one decision-making question</li>
+                        <li>Complete a short demographic survey</li>
+                        <li>Provide feedback on the study</li>
+                    </ul>
+                </div>
+                
+                <div class="consent-section">
+                    <h3>Consent Information:</h3>
+                    <p>By clicking "Begin Study" below, you confirm that:</p>
+                    <ul>
+                        <li>You are at least 18 years old</li>
+                        <li>You understand this is a voluntary research study</li>
+                        <li>You can withdraw at any time without penalty</li>
+                        <li>Your responses will be kept confidential</li>
+                    </ul>
+                </div>
+                
+                <div class="participant-info">
+                    <p><strong>Worker ID:</strong> <%= workerId %></p>
+                    <p><strong>Assignment ID:</strong> <%= assignmentId %></p>
+                    <p><strong>HIT ID:</strong> <%= hitId %></p>
+                </div>
+                
+                <a href="/instructions" class="btn btn-primary">Begin Study</a>
+            </div>
+        </main>
+        
+        <footer>
+            <p>This study is conducted by researchers at [University Name]. All responses are confidential.</p>
+        </footer>
+    </div>
+</body>
+</html>

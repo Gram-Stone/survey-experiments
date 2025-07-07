@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment Dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .experiment-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .experiment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .experiment-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #212529;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-completed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .progress-bar {
+            background-color: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #007bff;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .conditions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .condition-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+        
+        .condition-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .condition-count {
+            font-size: 1.1em;
+            color: #007bff;
+        }
+        
+        .refresh-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .timestamp {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Experiment Dashboard</h1>
+        
+        <button class="refresh-btn" onclick="window.location.reload()">
+            🔄 Refresh Data
+        </button>
+        
+        <% if (experiments.length === 0) { %>
+            <div class="experiment-card">
+                <p>No experiments have been initialized yet. Start an experiment to see its status here.</p>
+            </div>
+        <% } %>
+        
+        <% experiments.forEach(experiment => { %>
+            <div class="experiment-card">
+                <div class="experiment-header">
+                    <div class="experiment-title"><%= experiment.experimentId %></div>
+                    <div class="status-badge <%= experiment.isActive ? 'status-active' : 'status-completed' %>">
+                        <%= experiment.isActive ? 'Active' : 'Completed' %>
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: <%= experiment.progress %>%"></div>
+                </div>
+                
+                <div class="progress-text">
+                    <%= experiment.currentCount %> / <%= experiment.targetSampleSize %> participants 
+                    (<%= experiment.progress %>%)
+                </div>
+                
+                <% if (Object.keys(experiment.conditions).length > 0) { %>
+                    <div class="conditions-grid">
+                        <% Object.entries(experiment.conditions).forEach(([condition, data]) => { %>
+                            <div class="condition-item">
+                                <div class="condition-label"><%= condition %></div>
+                                <div class="condition-count"><%= data.current %> / <%= data.target %></div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+                
+                <% if (experiment.completedAt) { %>
+                    <div class="timestamp">
+                        Completed: <%= new Date(experiment.completedAt).toLocaleString() %>
+                    </div>
+                <% } %>
+            </div>
+        <% }) %>
+        
+        <div class="experiment-card">
+            <h3>AMT Integration</h3>
+            <p><strong>HIT Parameters:</strong> GET /amt-parameters/{experimentId}</p>
+            <p><strong>Manual HIT Expiration:</strong> POST /expire-hit</p>
+            <p><strong>AMT HIT Creation Links:</strong></p>
+            <ul>
+                <li><a href="/amt-parameters/font-pretest" target="_blank">Font Pretest HIT Parameters</a></li>
+                <li><a href="/amt-parameters/novemsky2007" target="_blank">Novemsky 2007 HIT Parameters</a></li>
+                <li><a href="/amt-parameters/allais-paradox" target="_blank">Allais Paradox HIT Parameters</a></li>
+            </ul>
+        </div>
+        
+        <div class="experiment-card">
+            <h3>API Endpoints</h3>
+            <p><strong>Status API:</strong> GET /status/{experimentId}</p>
+            <p><strong>Dashboard:</strong> GET /dashboard</p>
+            <p><strong>Experiment URLs:</strong></p>
+            <ul>
+                <li><a href="/?experiment=font-pretest">Font Pretest</a></li>
+                <li><a href="/?experiment=novemsky2007">Novemsky 2007 Replication</a></li>
+                <li><a href="/?experiment=allais-paradox">Allais Paradox</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

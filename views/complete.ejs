@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Fluency Experiment - Complete</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Psychology Research Study</h1>
+        </header>
+        
+        <main>
+            <div class="completion-section">
+                <h2>Study Complete</h2>
+                
+                <div class="completion-message">
+                    <p>Thank you for participating in our research study! Your responses have been recorded successfully.</p>
+                </div>
+                
+                <div class="completion-code">
+                    <h3>Your Completion Code:</h3>
+                    <div class="code-display">
+                        <strong id="completion-code"><%= completionCode %></strong>
+                        <button type="button" class="copy-btn" onclick="copyToClipboard()">📋 Copy</button>
+                    </div>
+                    <p>Please copy this code and paste it into the Amazon Mechanical Turk page to receive your payment.</p>
+                </div>
+                
+                <div class="amt-submission">
+                    <h3>Submit to Amazon Mechanical Turk:</h3>
+                    <p>To complete your participation and receive payment, please return to the Amazon Mechanical Turk page and submit your HIT with the completion code above.</p>
+                    
+                    <div class="submission-form">
+                        <form action="https://www.mturk.com/mturk/externalSubmit" method="POST">
+                            <input type="hidden" name="assignmentId" value="<%= assignmentId %>">
+                            <input type="hidden" name="completion_code" value="<%= completionCode %>">
+                            <button type="submit" class="btn btn-success">Submit HIT</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="thank-you">
+                    <h3>Thank You!</h3>
+                    <p>Your participation contributes to important research in psychology and decision-making. If you have any questions about this study, please contact the research team.</p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>This study is conducted by researchers at [University Name]. All responses are confidential.</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.getElementById('completion-code');
+            const code = codeElement.textContent.trim();
+            
+            // Modern browsers
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    fallbackCopy(code);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopy(code);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                console.error('Copy failed:', err);
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        function showCopySuccess() {
+            const button = document.querySelector('.copy-btn');
+            const originalText = button.textContent;
+            button.textContent = '✓ Copied!';
+            button.style.backgroundColor = '#28a745';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.backgroundColor = '';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

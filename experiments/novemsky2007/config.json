@@ -1,0 +1,53 @@
+{
+  "experimentId": "novemsky2007",
+  "title": "Novemsky et al. (2007) Study 1 Replication",
+  "description": "Exact replication of Novemsky et al. (2007) Study 1 - cordless phone choice",
+  "instructions": "Please read the following information about cordless phones and choose the option you would prefer:",
+  "scenario": {
+    "title": "Cordless Phone Selection",
+    "description": "You are shopping for a new cordless phone. Please review the two options below and make your choice."
+  },
+  "options": [
+    {
+      "id": "A",
+      "label": "Phone A",
+      "content": [
+        "Digital answering system with 15 minutes recording time",
+        "Caller ID with 50-name and number memory",
+        "10-channel auto scan",
+        "Battery low indicator",
+        "Price: $99"
+      ]
+    },
+    {
+      "id": "B", 
+      "label": "Phone B",
+      "content": [
+        "Digital answering system with 12 minutes recording time",
+        "Caller ID with 30-name and number memory", 
+        "5-channel auto scan",
+        "Battery low and in-use indicators",
+        "Headset jack",
+        "Price: $89"
+      ]
+    }
+  ],
+  "enableDefer": true,
+  "deferText": {
+    "label": "Continue Looking",
+    "content": ["I would like to continue looking at other Web sites before deciding"]
+  },
+  "questionText": "Which cordless phone would you prefer?",
+  "completionMessage": "Thank you for participating in our cordless phone choice study!",
+  "demographics": {
+    "collectAge": true,
+    "collectEducation": true
+  },
+  "experimentControl": {
+    "targetSampleSize": 200,
+    "conditions": {
+      "easy": 100,
+      "hard": 100
+    }
+  }
+}

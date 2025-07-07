@@ -1,0 +1,46 @@
+{
+  "experimentId": "allais-paradox",
+  "title": "Financial Decision Study", 
+  "description": "Allais paradox with processing fluency manipulation",
+  "instructions": "Please read the following scenario carefully and choose the option you would prefer:",
+  "scenario": {
+    "title": "Financial Decision Scenario",
+    "description": "Imagine you are faced with the following choice. Please select the option you would prefer:"
+  },
+  "options": [
+    {
+      "id": "A",
+      "label": "Option A",
+      "content": [
+        "$2,400 for certain"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Option B", 
+      "content": [
+        "33% chance of $2,500",
+        "66% chance of $2,400", 
+        "1% chance of $0"
+      ]
+    }
+  ],
+  "enableDefer": true,
+  "deferText": {
+    "label": "Continue Looking",
+    "content": ["I would like to continue looking at other Web sites before deciding"]
+  },
+  "questionText": "Which option would you prefer?",
+  "completionMessage": "Thank you for participating in our financial decision study!",
+  "demographics": {
+    "collectAge": true,
+    "collectEducation": true
+  },
+  "experimentControl": {
+    "targetSampleSize": 150,
+    "conditions": {
+      "easy": 75,
+      "hard": 75
+    }
+  }
+}

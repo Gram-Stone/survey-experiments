@@ -1,0 +1,46 @@
+{
+  "experimentId": "template",
+  "title": "Template Experiment",
+  "description": "Base template for creating new fluency experiments",
+  "instructions": "This is a template for instructions that will appear before the main task.",
+  "scenario": {
+    "title": "Decision Scenario",
+    "description": "Description of the choice scenario goes here."
+  },
+  "options": [
+    {
+      "id": "A",
+      "label": "Option A", 
+      "content": [
+        "Description of first option"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Option B",
+      "content": [
+        "Description of second option"  
+      ]
+    }
+  ],
+  "enableDefer": true,
+  "deferText": {
+    "label": "Continue Looking",
+    "content": ["I would like to see more options before deciding"]
+  },
+  "questionText": "Which option would you prefer?",
+  "completionMessage": "Thank you for participating in our research study!",
+  "demographics": {
+    "collectAge": true,
+    "collectEducation": true
+  },
+  "manipulationCheck": {
+    "question": "How easy was it to read the text in the decision task?",
+    "scale": {
+      "min": 1,
+      "max": 9,
+      "minLabel": "Very difficult to read",
+      "maxLabel": "Very easy to read"
+    }
+  }
+}

@@ -1,0 +1,65 @@
+<!-- Dynamic experiment content based on config -->
+<div class="experiment-section">
+    <h2>Decision Task</h2>
+    
+    <% if (typeof error !== 'undefined') { %>
+        <div class="error-message">
+            <%= error %>
+        </div>
+    <% } %>
+    
+    <div class="scenario-description">
+        <p><%= experiment.instructions || 'Please read the following scenario carefully and choose the option you would prefer:' %></p>
+        <% if (attributionCondition === 'present' && fontCondition === 'hard') { %>
+            <p class="attribution-note"><em>Note: This information may be difficult to read because of the font.</em></p>
+        <% } %>
+    </div>
+    
+    <form method="POST" action="/experiment">
+        <div class="decision-scenario">
+            <h3><%= experiment.scenario.title %></h3>
+            
+            <div class="scenario-text">
+                <p><%= experiment.scenario.description %></p>
+            </div>
+            
+            <div class="options-container">
+                <% experiment.options.forEach(function(option) { %>
+                    <div class="option-box">
+                        <label for="option<%= option.id %>" class="option-label">
+                            <input type="radio" id="option<%= option.id %>" name="choice" value="<%= option.id %>">
+                            <div class="option-content <%= fontCondition %>-font">
+                                <h4><%= option.label %></h4>
+                                <% option.content.forEach(function(line) { %>
+                                    <p><%= line %></p>
+                                <% }); %>
+                            </div>
+                        </label>
+                    </div>
+                <% }); %>
+                
+                <% if (experiment.enableDefer) { %>
+                    <div class="option-box defer-option">
+                        <label for="optionDefer" class="option-label">
+                            <input type="radio" id="optionDefer" name="choice" value="DEFER">
+                            <div class="option-content <%= fontCondition %>-font">
+                                <h4><%= experiment.deferText.label %></h4>
+                                <% experiment.deferText.content.forEach(function(line) { %>
+                                    <p><%= line %></p>
+                                <% }); %>
+                            </div>
+                        </label>
+                    </div>
+                <% } %>
+            </div>
+            
+            <div class="question-text">
+                <p><strong><%= experiment.questionText %></strong></p>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button type="submit" class="btn btn-primary">Continue</button>
+        </div>
+    </form>
+</div>

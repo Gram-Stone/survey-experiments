@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: survey-experiments
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false  # Set this in Render dashboard for security
+      - key: SESSION_SECRET
+        generateValue: true  # Render will generate a secure random value
+      - key: BASE_URL
+        value: https://survey-experiments.onrender.com  # Update with your actual app name
+      - key: AMT_ENDPOINT
+        value: https://mturk-requester-sandbox.us-east-1.amazonaws.com
+      - key: AMT_REGION
+        value: us-east-1
+      - key: AMT_REWARD
+        value: "1.00"
+    healthCheckPath: /dashboard

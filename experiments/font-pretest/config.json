@@ -1,0 +1,54 @@
+{
+  "experimentId": "font-pretest",
+  "title": "Font Readability Pretest",
+  "description": "Validation study to test readability differences between font conditions",
+  "instructions": "You will see two different text samples. Please rate how easy each one is to read.",
+  "scenario": {
+    "title": "Font Readability Assessment",
+    "description": "Please read each text sample and rate its readability on the scale provided."
+  },
+  "fontSamples": [
+    {
+      "id": "easy",
+      "label": "Text Sample A",
+      "content": [
+        "This is a sample of text to evaluate readability.",
+        "Please read this text carefully and rate how easy it is to read.",
+        "The text contains standard product information that you might see in an online store.",
+        "This includes details about features, specifications, and pricing information."
+      ],
+      "fontClass": "easy-font"
+    },
+    {
+      "id": "hard", 
+      "label": "Text Sample B",
+      "content": [
+        "This is a sample of text to evaluate readability.",
+        "Please read this text carefully and rate how easy it is to read.", 
+        "The text contains standard product information that you might see in an online store.",
+        "This includes details about features, specifications, and pricing information."
+      ],
+      "fontClass": "hard-font"
+    }
+  ],
+  "ratingScale": {
+    "question": "How easy was this text to read?",
+    "min": 1,
+    "max": 9,
+    "minLabel": "Very difficult to read",
+    "maxLabel": "Very easy to read"
+  },
+  "enableDefer": false,
+  "demographics": {
+    "collectAge": false,
+    "collectEducation": false
+  },
+  "withinSubjects": true,
+  "randomizeOrder": true,
+  "experimentControl": {
+    "targetSampleSize": 50,
+    "conditions": {
+      "pretest": 50
+    }
+  }
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychology Research Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Psychology Research Platform</h1>
+        </header>
+        
+        <main>
+            <div class="selection-section">
+                <h2>Available Experiments</h2>
+                
+                <div class="experiment-list">
+                    <% experiments.forEach(function(experiment) { %>
+                        <div class="experiment-card">
+                            <h3><%= experiment.title %></h3>
+                            <p><%= experiment.description %></p>
+                            <a href="/?experiment=<%= experiment.id %>&workerId=TEST&assignmentId=TEST&hitId=TEST" class="btn btn-primary">
+                                Preview Study
+                            </a>
+                        </div>
+                    <% }); %>
+                </div>
+                
+                <div class="platform-info">
+                    <h3>About This Platform</h3>
+                    <p>This research platform tests how processing fluency affects decision-making across various behavioral economics phenomena. Each experiment uses the same methodology but different choice scenarios.</p>
+                    
+                    <p><strong>For researchers:</strong> To run an experiment via Amazon Mechanical Turk, use the URL format:<br>
+                    <code>https://your-domain.com/?experiment=EXPERIMENT_ID&workerId={{workerId}}&assignmentId={{assignmentId}}&hitId={{hitId}}</code></p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>This research platform is based on Novemsky et al. (2007) "Preference Fluency in Choice" methodology.</p>
+        </footer>
+    </div>
+</body>
+</html>
