@@ -30,13 +30,14 @@
         "Headset jack",
         "Price: $89"
       ]
+    },
+    {
+      "id": "DEFER",
+      "label": "Continue Looking",
+      "content": ["I would like to continue looking at other Web sites before deciding"]
     }
   ],
-  "enableDefer": true,
-  "deferText": {
-    "label": "Continue Looking",
-    "content": ["I would like to continue looking at other Web sites before deciding"]
-  },
+  "enableDefer": false,
   "questionText": "Which cordless phone would you prefer?",
   "completionMessage": "Thank you for participating in our cordless phone choice study!",
   "demographics": {

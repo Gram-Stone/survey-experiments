@@ -37,20 +37,6 @@
                         </label>
                     </div>
                 <% }); %>
-                
-                <% if (experiment.enableDefer) { %>
-                    <div class="option-box defer-option">
-                        <label for="optionDefer" class="option-label">
-                            <input type="radio" id="optionDefer" name="choice" value="DEFER">
-                            <div class="option-content <%= fontCondition ? (fontCondition + '-font') : '' %>">
-                                <h4><%= experiment.deferText.label %></h4>
-                                <% experiment.deferText.content.forEach(function(line) { %>
-                                    <p><%= line %></p>
-                                <% }); %>
-                            </div>
-                        </label>
-                    </div>
-                <% } %>
             </div>
             
             <div class="question-text">

@@ -25,11 +25,7 @@
       ]
     }
   ],
-  "enableDefer": true,
-  "deferText": {
-    "label": "Continue Looking",
-    "content": ["I would like to continue looking at other Web sites before deciding"]
-  },
+  "enableDefer": false,
   "questionText": "Which option would you prefer?",
   "completionMessage": "Thank you for participating in our financial decision study!",
   "demographics": {
