@@ -218,13 +218,14 @@ small {
     margin-bottom: 5px;
 }
 
+/* Defer option should have identical styling to avoid confounding fluency effects */
 .defer-option {
-    border-color: #6c757d;
+    border-color: #ddd; /* Same as other options */
 }
 
 .defer-option .option-content {
-    color: #6c757d;
-    font-style: italic;
+    /* No special styling - inherit font condition only */
+    /* color and font-style will come from .easy-font or .hard-font classes */
 }
 
 .attribution-note {
