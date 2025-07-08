@@ -144,7 +144,8 @@ router.get('/', handleExperimentStart);
 router.post('/', handleExperimentStart);
 
 // Instructions page
-router.get('/instructions', (req, res) => {
+router.get('/instructions', async (req, res) => {
+  console.log('Instructions page - URL params:', req.query);
   console.log('Instructions page - Session data:', {
     sessionId: req.sessionID,
     workerId: req.session.workerId,
@@ -152,8 +153,30 @@ router.get('/instructions', (req, res) => {
     nodeEnv: process.env.NODE_ENV
   });
   
+  // Try to get parameters from URL if session is empty (MTurk iframe issue)
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (!req.session.workerId && workerId && assignmentId && hitId && experiment) {
+    console.log('Session empty, reinitializing from URL parameters');
+    
+    // Reinitialize session from URL parameters
+    req.session.workerId = workerId;
+    req.session.assignmentId = assignmentId;
+    req.session.hitId = hitId;
+    req.session.experimentId = experiment;
+    req.session.turkSubmitTo = turkSubmitTo;
+    
+    // Only assign font/attribution conditions for fluency intervention experiments
+    if (experiment !== 'font-pretest') {
+      const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+      req.session.fontCondition = fontCondition;
+      req.session.attributionCondition = attributionCondition;
+    }
+  }
+  
   if (!req.session.workerId) {
-    console.log('No workerId in session, redirecting to home');
+    console.log('No workerId in session or URL, redirecting to home');
     return res.redirect('/');
   }
   
