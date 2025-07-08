@@ -26,10 +26,18 @@ function getClientIP(req) {
 router.get('/', async (req, res) => {
   const { workerId, assignmentId, hitId, experiment } = req.query;
   
-  // If no experiment specified, show selection page
+  // If no experiment specified
   if (!experiment) {
-    const experiments = experimentLoader.getAvailableExperiments();
-    return res.render('experiment-selection', { experiments });
+    // In development, show experiment selection
+    if (process.env.NODE_ENV !== 'production') {
+      const experiments = experimentLoader.getAvailableExperiments();
+      return res.render('experiment-selection', { experiments });
+    }
+    
+    // In production, require MTurk access
+    return res.render('error', { 
+      message: 'This study must be accessed through Amazon Mechanical Turk. Please find our study on MTurk to participate.' 
+    });
   }
 
   // Load the specified experiment
