@@ -15,8 +15,15 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet());
+// Security middleware - allow iframe embedding for MTurk
+app.use(helmet({
+  frameguard: false, // Disable X-Frame-Options
+  contentSecurityPolicy: {
+    directives: {
+      frameAncestors: ["'self'", "https://www.mturk.com", "https://workersandbox.mturk.com"]
+    }
+  }
+}));
 
 // Body parsing middleware
 app.use(express.urlencoded({ extended: true }));
