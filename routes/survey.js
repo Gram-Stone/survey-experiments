@@ -426,6 +426,18 @@ router.get('/complete', async (req, res) => {
     return res.redirect('/');
   }
   
+  // Check if we have all required data
+  if (!req.session.choice || !req.session.age || !req.session.education) {
+    console.log('Missing required session data:', {
+      choice: !!req.session.choice,
+      age: !!req.session.age,
+      education: !!req.session.education
+    });
+    return res.render('error', { 
+      message: 'Session data incomplete. Please restart the study from the beginning.' 
+    });
+  }
+  
   try {
     // Check if worker has already completed any experiment
     const existingResponse = await Response.findOne({ workerId: req.session.workerId });
@@ -498,6 +510,17 @@ router.get('/complete', async (req, res) => {
     
   } catch (error) {
     console.error('Error saving response:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      sessionData: {
+        workerId: req.session.workerId,
+        experimentId: req.session.experimentId,
+        choice: req.session.choice,
+        age: req.session.age,
+        education: req.session.education
+      }
+    });
     res.render('error', { 
       message: 'Error saving your response. Please try again.' 
     });
