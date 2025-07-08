@@ -339,7 +339,7 @@ router.get('/amt-parameters/:experimentId', async (req, res) => {
     res.json({
       experimentId,
       hitParameters: hitParams,
-      externalUrl: `${req.protocol}://${req.get('host')}/?experiment=${experimentId}`,
+      externalUrl: `${req.protocol}://${req.get('host')}/?experiment=${experimentId}&workerId=\${workerId}&assignmentId=\${assignmentId}&hitId=\${hitId}`,
       instructions: {
         step1: "Copy the HIT parameters below",
         step2: "Go to Amazon Mechanical Turk Requester Interface",
