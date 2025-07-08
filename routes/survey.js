@@ -42,7 +42,7 @@ async function handleExperimentStart(req, res) {
     turkSubmitTo = req.body.turkSubmitTo || turkSubmitTo;
   }
   
-  console.log('Extracted parameters:', { workerId, assignmentId, hitId, experiment });
+  console.log('Extracted parameters:', { workerId, assignmentId, hitId, experiment, turkSubmitTo });
   
   // If no experiment specified
   if (!experiment) {
@@ -293,7 +293,8 @@ router.get('/complete', async (req, res) => {
     const completionInfo = {
       completionCode,
       assignmentId: req.session.assignmentId,
-      hitId: req.session.hitId
+      hitId: req.session.hitId,
+      turkSubmitTo: req.session.turkSubmitTo || 'https://workersandbox.mturk.com'
     };
     
     // Clear session
@@ -303,7 +304,7 @@ router.get('/complete', async (req, res) => {
       completionCode,
       assignmentId: completionInfo.assignmentId,
       hitId: completionInfo.hitId,
-      turkSubmitTo: req.session.turkSubmitTo || 'https://workersandbox.mturk.com'
+      turkSubmitTo: completionInfo.turkSubmitTo
     });
     
   } catch (error) {
