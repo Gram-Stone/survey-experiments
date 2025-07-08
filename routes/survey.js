@@ -2,7 +2,7 @@ import express from 'express';
 import Response from '../models/response.js';
 import ExperimentControl from '../models/experimentControl.js';
 import experimentLoader from '../lib/experimentLoader.js';
-import { handleExperimentCompletion, createHit } from '../lib/amtIntegration.js';
+import { handleExperimentCompletion, createHit, listAllHits, getHitStatus } from '../lib/amtIntegration.js';
 
 const router = express.Router();
 
@@ -708,6 +708,46 @@ router.post('/expire-hit', async (req, res) => {
   } catch (error) {
     console.error('Error expiring HIT:', error);
     res.status(500).json({ error: 'Error expiring HIT' });
+  }
+});
+
+// Check HIT status endpoint
+router.get('/hit-status/:hitId', async (req, res) => {
+  try {
+    const { hitId } = req.params;
+    const status = await getHitStatus(hitId);
+    res.json(status);
+  } catch (error) {
+    console.error('Error getting HIT status:', error);
+    res.status(500).json({ error: 'Error getting HIT status' });
+  }
+});
+
+// List all HITs endpoint
+router.get('/list-hits', async (req, res) => {
+  try {
+    const hits = await listAllHits();
+    if (!hits) {
+      return res.json({ message: 'AMT not configured - check HITs manually at https://requestersandbox.mturk.com' });
+    }
+    
+    // Get basic info for each HIT
+    const hitSummaries = hits.map(hit => ({
+      hitId: hit.HITId,
+      title: hit.Title,
+      status: hit.HITStatus,
+      maxAssignments: hit.MaxAssignments,
+      numberOfAssignmentsAvailable: hit.NumberOfAssignmentsAvailable,
+      numberOfAssignmentsPending: hit.NumberOfAssignmentsPending,
+      numberOfAssignmentsCompleted: hit.NumberOfAssignmentsCompleted,
+      creationTime: hit.CreationTime,
+      expiration: hit.Expiration
+    }));
+    
+    res.json({ hits: hitSummaries });
+  } catch (error) {
+    console.error('Error listing HITs:', error);
+    res.status(500).json({ error: 'Error listing HITs' });
   }
 });
 
