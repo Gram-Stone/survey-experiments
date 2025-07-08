@@ -2,7 +2,7 @@ import express from 'express';
 import Response from '../models/response.js';
 import ExperimentControl from '../models/experimentControl.js';
 import experimentLoader from '../lib/experimentLoader.js';
-import { handleExperimentCompletion, createHit, listAllHits, getHitStatus } from '../lib/amtIntegration.js';
+import { handleExperimentCompletion, createHit, listAllHits, getHitStatus, approveAssignment, rejectAssignment } from '../lib/amtIntegration.js';
 
 const router = express.Router();
 
@@ -748,6 +748,48 @@ router.get('/list-hits', async (req, res) => {
   } catch (error) {
     console.error('Error listing HITs:', error);
     res.status(500).json({ error: 'Error listing HITs' });
+  }
+});
+
+// Approve assignment endpoint
+router.post('/approve-assignment', async (req, res) => {
+  try {
+    const { assignmentId, feedback } = req.body;
+    
+    if (!assignmentId) {
+      return res.status(400).json({ error: 'assignmentId is required' });
+    }
+    
+    const success = await approveAssignment(assignmentId, feedback);
+    
+    res.json({ 
+      success,
+      message: success ? 'Assignment approved successfully' : 'Failed to approve assignment - check logs'
+    });
+  } catch (error) {
+    console.error('Error approving assignment:', error);
+    res.status(500).json({ error: 'Error approving assignment' });
+  }
+});
+
+// Reject assignment endpoint
+router.post('/reject-assignment', async (req, res) => {
+  try {
+    const { assignmentId, feedback } = req.body;
+    
+    if (!assignmentId || !feedback) {
+      return res.status(400).json({ error: 'assignmentId and feedback are required' });
+    }
+    
+    const success = await rejectAssignment(assignmentId, feedback);
+    
+    res.json({ 
+      success,
+      message: success ? 'Assignment rejected successfully' : 'Failed to reject assignment - check logs'
+    });
+  } catch (error) {
+    console.error('Error rejecting assignment:', error);
+    res.status(500).json({ error: 'Error rejecting assignment' });
   }
 });
 
