@@ -22,7 +22,8 @@ app.use(helmet({
     directives: {
       frameAncestors: ["'self'", "https://www.mturk.com", "https://workersandbox.mturk.com"],
       scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for dashboard
-      scriptSrcAttr: ["'unsafe-inline'"] // Allow inline event handlers
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
+      formAction: ["'self'", "https://www.mturk.com", "https://workersandbox.mturk.com"] // Allow form submission to MTurk
     }
   }
 }));
