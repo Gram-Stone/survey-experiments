@@ -78,6 +78,18 @@ router.get('/', async (req, res) => {
     return res.render('preview', { workerId, assignmentId, hitId });
   }
 
+  // Check if worker has already completed any experiment
+  try {
+    const existingResponse = await Response.findOne({ workerId: workerId });
+    if (existingResponse) {
+      return res.render('error', { 
+        message: 'You have already participated in one of our studies. Thank you for your interest, but you cannot participate in multiple studies.' 
+      });
+    }
+  } catch (err) {
+    console.error('Error checking existing participation:', err);
+  }
+
   // Store in session
   req.session.workerId = workerId;
   req.session.assignmentId = assignmentId;
