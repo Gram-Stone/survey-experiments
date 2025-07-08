@@ -20,7 +20,9 @@ app.use(helmet({
   frameguard: false, // Disable X-Frame-Options
   contentSecurityPolicy: {
     directives: {
-      frameAncestors: ["'self'", "https://www.mturk.com", "https://workersandbox.mturk.com"]
+      frameAncestors: ["'self'", "https://www.mturk.com", "https://workersandbox.mturk.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for dashboard
+      scriptSrcAttr: ["'unsafe-inline'"] // Allow inline event handlers
     }
   }
 }));
