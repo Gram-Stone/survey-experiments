@@ -256,12 +256,46 @@ router.post('/experiment', (req, res) => {
   }
   
   req.session.choice = choice;
-  res.redirect('/demographics');
+  
+  // Preserve URL parameters in redirect
+  const queryString = new URLSearchParams(req.query).toString();
+  const redirectUrl = queryString ? `/demographics?${queryString}` : '/demographics';
+  res.redirect(redirectUrl);
 });
 
 // Demographics page
 router.get('/demographics', (req, res) => {
-  if (!req.session.workerId || !req.session.choice) {
+  console.log('Demographics page - URL params:', req.query);
+  console.log('Demographics page - Session data:', {
+    sessionId: req.sessionID,
+    workerId: req.session.workerId,
+    choice: req.session.choice
+  });
+  
+  // Try to get parameters from URL if session is empty
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (!req.session.workerId && workerId && assignmentId && hitId && experiment) {
+    console.log('Demographics session empty, reinitializing from URL parameters');
+    
+    // Reinitialize session from URL parameters
+    req.session.workerId = workerId;
+    req.session.assignmentId = assignmentId;
+    req.session.hitId = hitId;
+    req.session.experimentId = experiment;
+    req.session.turkSubmitTo = turkSubmitTo;
+    
+    // Only assign font/attribution conditions for fluency intervention experiments
+    if (experiment !== 'font-pretest') {
+      const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+      req.session.fontCondition = fontCondition;
+      req.session.attributionCondition = attributionCondition;
+    }
+  }
+  
+  if (!req.session.workerId) {
+    console.log('No workerId in demographics, redirecting to home');
     return res.redirect('/');
   }
   
@@ -287,14 +321,48 @@ router.post('/demographics', (req, res) => {
   
   req.session.age = parseInt(age);
   req.session.education = education;
-  res.redirect('/complete');
+  
+  // Preserve URL parameters in redirect
+  const queryString = new URLSearchParams(req.query).toString();
+  const redirectUrl = queryString ? `/complete?${queryString}` : '/complete';
+  res.redirect(redirectUrl);
 });
 
 
 // Completion page
 router.get('/complete', async (req, res) => {
-  if (!req.session.workerId || !req.session.choice || 
-      !req.session.age) {
+  console.log('Complete page - URL params:', req.query);
+  console.log('Complete page - Session data:', {
+    sessionId: req.sessionID,
+    workerId: req.session.workerId,
+    choice: req.session.choice,
+    age: req.session.age
+  });
+  
+  // Try to get parameters from URL if session is empty
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (!req.session.workerId && workerId && assignmentId && hitId && experiment) {
+    console.log('Complete session empty, reinitializing from URL parameters');
+    
+    // Reinitialize session from URL parameters
+    req.session.workerId = workerId;
+    req.session.assignmentId = assignmentId;
+    req.session.hitId = hitId;
+    req.session.experimentId = experiment;
+    req.session.turkSubmitTo = turkSubmitTo;
+    
+    // Only assign font/attribution conditions for fluency intervention experiments
+    if (experiment !== 'font-pretest') {
+      const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+      req.session.fontCondition = fontCondition;
+      req.session.attributionCondition = attributionCondition;
+    }
+  }
+  
+  if (!req.session.workerId) {
+    console.log('No workerId in complete page, redirecting to home');
     return res.redirect('/');
   }
   
