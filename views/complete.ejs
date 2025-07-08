@@ -47,50 +47,17 @@
     </div>
     
     <script>
-        function copyToClipboard() {
+        async function copyToClipboard() {
             const codeElement = document.getElementById('completion-code');
             const code = codeElement.textContent.trim();
             
-            // Try modern clipboard API first
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(code).then(() => {
-                    showCopySuccess();
-                }).catch((err) => {
-                    console.log('Clipboard API failed, trying fallback:', err);
-                    fallbackCopy(code);
-                });
-            } else {
-                // Use fallback method
-                fallbackCopy(code);
-            }
-        }
-        
-        function fallbackCopy(text) {
-            // Create temporary text area
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            
-            // Select and copy
-            textArea.focus();
-            textArea.select();
-            
             try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showCopySuccess();
-                } else {
-                    showCopyFailed();
-                }
+                await navigator.clipboard.writeText(code);
+                showCopySuccess();
             } catch (err) {
-                console.error('Copy failed:', err);
+                console.error('Failed to copy text:', err);
                 showCopyFailed();
             }
-            
-            document.body.removeChild(textArea);
         }
         
         function showCopySuccess() {
@@ -110,11 +77,11 @@
         function showCopyFailed() {
             const button = document.querySelector('.copy-btn');
             const originalText = button.textContent;
-            button.textContent = '⚠ Select & Copy';
+            button.textContent = '⚠ Select text manually';
             button.style.backgroundColor = '#ffc107';
             button.style.color = 'black';
             
-            // Also select the code text for manual copying
+            // Select the code text for manual copying
             const codeElement = document.getElementById('completion-code');
             const range = document.createRange();
             range.selectNodeContents(codeElement);
