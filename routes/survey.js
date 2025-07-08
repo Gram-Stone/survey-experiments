@@ -207,6 +207,14 @@ router.get('/complete', async (req, res) => {
   }
   
   try {
+    // Check if worker has already completed any experiment
+    const existingResponse = await Response.findOne({ workerId: req.session.workerId });
+    if (existingResponse) {
+      return res.render('error', { 
+        message: 'You have already participated in one of our studies. Thank you for your interest, but you cannot participate in multiple studies.' 
+      });
+    }
+
     // Generate completion code
     const completionCode = generateCompletionCode();
     
