@@ -249,11 +249,14 @@
             const originalText = button.textContent;
             const resultDiv = document.getElementById('hit-result');
             
+            console.log('Creating HIT for experiment:', experimentId);
+            
             // Disable button and show loading
             button.disabled = true;
             button.textContent = 'Creating HIT...';
             
             try {
+                console.log('Making fetch request to:', `/create-hit/${experimentId}`);
                 const response = await fetch(`/create-hit/${experimentId}`, {
                     method: 'POST',
                     headers: {
@@ -261,7 +264,11 @@
                     }
                 });
                 
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
                 const result = await response.json();
+                console.log('Response data:', result);
                 
                 // Show result
                 resultDiv.style.display = 'block';
