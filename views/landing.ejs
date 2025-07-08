@@ -43,7 +43,7 @@
                     <p><strong>HIT ID:</strong> <%= hitId %></p>
                 </div>
                 
-                <a href="/instructions" class="btn btn-primary" onclick="console.log('Begin Study clicked', window.location.search); this.href = '/instructions' + window.location.search; return true;">Begin Study</a>
+                <button class="btn btn-primary" onclick="beginStudy()">Begin Study</button>
             </div>
         </main>
         
@@ -51,5 +51,20 @@
             <p>All responses are confidential.</p>
         </footer>
     </div>
+    
+    <script>
+        function beginStudy() {
+            console.log('Begin Study clicked');
+            console.log('Current URL:', window.location.href);
+            console.log('Search params:', window.location.search);
+            
+            // Try different navigation methods
+            const targetUrl = '/instructions' + window.location.search;
+            console.log('Target URL:', targetUrl);
+            
+            // Force navigation in the current frame
+            window.location.assign(targetUrl);
+        }
+    </script>
 </body>
 </html>
