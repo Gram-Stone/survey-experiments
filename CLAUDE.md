@@ -54,8 +54,8 @@ survey-experiments/
 ## Research Framework
 Based on **Novemsky et al. (2007) Study 1** methodology:
 - **2×2 factorial design**: Font fluency (easy/hard) × Attribution (present/absent)
-- **Processing fluency manipulation**: Eye-straining italicized serif font with drop shadow
-- **Attribution manipulation**: "This information may be difficult to read because of the font"
+- **Processing fluency intervention**: Eye-straining italicized serif font with drop shadow
+- **Attribution intervention**: "This information may be difficult to read because of the font"
 - **Dependent variables**: Choice deferral rates and preference patterns
 
 ## Available Experiments
@@ -86,7 +86,7 @@ Based on **Novemsky et al. (2007) Study 1** methodology:
   allaisChoice: String,         // 'A', 'B', or 'DEFER'
   age: Number,
   education: String,
-  readabilityRating: Number,    // 1-5 manipulation check
+  readabilityRating: Number,    // 1-5 intervention check
   completionCode: String,       // Format: PILOT{4-random-alphanumeric}
   ipAddress: String,
   timestamps: true
@@ -125,13 +125,13 @@ PORT=3000
 
 ## Success Criteria
 1. Survey loads and captures AMT parameters correctly
-2. Font manipulation creates clear visual difference
+2. Font intervention creates clear visual difference
 3. All responses save to database with proper structure
 4. Completion codes generate and AMT submission works
 5. Deploys successfully to Render.com
 
 ## Modular Design Principles
-- **Standardized fluency manipulation** across all experiments
+- **Standardized fluency intervention** across all experiments
 - **Consistent AMT integration** and session management
 - **Flexible experiment configuration** via JSON/config files
 - **Reusable survey flow** templates
@@ -156,7 +156,7 @@ Built-in analysis system using functional programming approach (no external stat
 
 **Key Metrics Calculated:**
 - **Deferral rates** by font condition (replicating 17% easy vs 41% hard font finding)
-- **Attribution manipulation** effects (hard font effect should disappear when attributed to font)
+- **Attribution intervention** effects (hard font effect should disappear when attributed to font)
 - **Risk preferences** (certain vs lottery choices in Allais paradox)
 - **Manipulation checks** (font readability ratings)
 - **Chi-square tests** for statistical significance
@@ -171,6 +171,6 @@ Built-in analysis system using functional programming approach (no external stat
 
 ## Design Considerations
 - **Interface Aesthetics**: Deliberately neutral "institutional research study" design to avoid confounding fluency effects
-- **Visual Balance**: Clean enough to avoid distracting ugliness, unremarkable enough to let font manipulation be the primary fluency variable
+- **Visual Balance**: Clean enough to avoid distracting ugliness, unremarkable enough to let font intervention be the primary fluency variable
 - **Avoiding Confounds**: Beautiful interfaces could create processing fluency that competes with font disfluency; ugly interfaces could create their own cognitive load
-- **Cross-Experiment Consistency**: Same visual design and fluency manipulation across all behavioral economics tests
+- **Cross-Experiment Consistency**: Same visual design and fluency intervention across all behavioral economics tests

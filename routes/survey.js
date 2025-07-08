@@ -104,7 +104,7 @@ router.get('/', async (req, res) => {
   req.session.hitId = hitId;
   req.session.startTime = new Date();
 
-  // Only assign font/attribution conditions for fluency manipulation experiments
+  // Only assign font/attribution conditions for fluency intervention experiments
   if (experiment !== 'font-pretest') {
     const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
     const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';

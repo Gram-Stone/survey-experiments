@@ -3,7 +3,7 @@
   "title": "Financial Decision Study", 
   "description": "Allais paradox with processing fluency manipulation",
   "instructions": "Please read the following scenario carefully and choose the option you would prefer:",
-  "scenario": {
+  "decision": {
     "title": "Financial Decision Scenario",
     "description": "Imagine you are faced with the following choice. Please select the option you would prefer:"
   },

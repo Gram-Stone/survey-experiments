@@ -361,7 +361,7 @@ async function analyzeExperiment(experimentId) {
       console.log('This should provide adequate power to detect medium-sized effects.');
     } else if (experimentId === 'font-pretest') {
       console.log('Recommended minimum sample size: 50 participants');
-      console.log('This is a manipulation check study requiring less power.');
+      console.log('This is an intervention check study requiring less power.');
     }
     
     const remaining = Math.max(0, getRecommendedSampleSize(experimentId) - data.length);

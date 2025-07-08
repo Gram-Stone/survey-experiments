@@ -8,19 +8,19 @@
         </div>
     <% } %>
     
-    <div class="scenario-description">
-        <p><%= experiment.instructions || 'Please read the following scenario carefully and choose the option you would prefer:' %></p>
+    <div class="decision-description">
+        <p><%= experiment.instructions || 'Please read the following decision carefully and choose the option you would prefer:' %></p>
         <% if (typeof attributionCondition !== 'undefined' && attributionCondition === 'present') { %>
             <p class="attribution-note"><em>Note: This information may be difficult to read because of the font.</em></p>
         <% } %>
     </div>
     
     <form method="POST" action="/experiment">
-        <div class="decision-scenario">
-            <h3><%= experiment.scenario.title %></h3>
+        <div class="decision-content">
+            <h3><%= experiment.decision.title %></h3>
             
-            <div class="scenario-text">
-                <p><%= experiment.scenario.description %></p>
+            <div class="decision-text">
+                <p><%= experiment.decision.description %></p>
             </div>
             
             <div class="options-container">

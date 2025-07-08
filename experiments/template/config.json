@@ -3,7 +3,7 @@
   "title": "Template Experiment",
   "description": "Base template for creating new fluency experiments",
   "instructions": "This is a template for instructions that will appear before the main task.",
-  "scenario": {
+  "decision": {
     "title": "Decision Scenario",
     "description": "Description of the choice scenario goes here."
   },
@@ -34,7 +34,7 @@
     "collectAge": true,
     "collectEducation": true
   },
-  "manipulationCheck": {
+  "interventionCheck": {
     "question": "How easy was it to read the text in the decision task?",
     "scale": {
       "min": 1,

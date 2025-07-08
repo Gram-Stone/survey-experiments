@@ -18,11 +18,11 @@
     "completion": { "enabled": true, "title": "Complete" }
   },
   
-  "manipulations": {
+  "interventions": {
     "font": {
       "enabled": true,
       "conditions": ["easy", "hard"],
-      "applyTo": ["scenario", "options", "instructions"]
+      "applyTo": ["decision", "options", "instructions"]
     },
     "attribution": {
       "enabled": true,
@@ -34,7 +34,7 @@
   
   "experiment": {
     "instructions": "string",
-    "scenario": {
+    "decision": {
       "title": "string",
       "description": "string"
     },
@@ -168,7 +168,7 @@
     "completion": { "enabled": true, "title": "Complete" }
   },
   
-  "manipulations": {
+  "interventions": {
     "font": { "enabled": false },
     "attribution": { "enabled": false }
   },
@@ -226,8 +226,8 @@
 
 1. **Flexible Response Types**: Supports choice, rating, comparison, and within-subjects designs
 2. **Configurable Page Flow**: Can enable/disable pages as needed
-3. **Modular Manipulations**: Font and attribution manipulations are optional and configurable
+3. **Modular Interventions**: Font and attribution interventions are optional and configurable
 4. **Unified Template System**: Same templates can render different experiment types based on responseType
-5. **Extensible**: Easy to add new response types or manipulations without changing core code
+5. **Extensible**: Easy to add new response types or interventions without changing core code
 
 This would allow the font-pretest experiment to work properly while maintaining the existing choice-based experiments.

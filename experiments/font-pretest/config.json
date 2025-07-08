@@ -3,7 +3,7 @@
   "title": "Text Readability Study",
   "description": "Study examining text readability differences",
   "instructions": "You will see two different text samples below. Please read both carefully and choose which one is easier to read.",
-  "scenario": {
+  "decision": {
     "title": "Text Readability Comparison",
     "description": "Please read both text samples and select which one you find easier to read."
   },

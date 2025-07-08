@@ -3,7 +3,7 @@
   "title": "Novemsky et al. (2007) Study 1 Replication",
   "description": "Exact replication of Novemsky et al. (2007) Study 1 - cordless phone choice",
   "instructions": "Please read the following information about cordless phones and choose the option you would prefer:",
-  "scenario": {
+  "decision": {
     "title": "Cordless Phone Selection",
     "description": "You are shopping for a new cordless phone. Please review the two options below and make your choice."
   },

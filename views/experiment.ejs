@@ -22,18 +22,18 @@
                     </div>
                 <% } %>
                 
-                <div class="scenario-description">
-                    <p class="<%= fontCondition %>-font">Please read the following scenario carefully and choose the option you would prefer:</p>
+                <div class="decision-description">
+                    <p class="<%= fontCondition %>-font">Please read the following decision carefully and choose the option you would prefer:</p>
                     <% if (attributionCondition === 'present' && fontCondition === 'hard') { %>
                         <p class="attribution-note"><em>Note: This information may be difficult to read because of the font.</em></p>
                     <% } %>
                 </div>
                 
                 <form method="POST" action="/experiment">
-                    <div class="decision-scenario">
-                        <h3 class="<%= fontCondition %>-font">Financial Decision Scenario</h3>
+                    <div class="decision-content">
+                        <h3 class="<%= fontCondition %>-font">Financial Decision</h3>
                         
-                        <div class="scenario-text <%= fontCondition %>-font">
+                        <div class="decision-text <%= fontCondition %>-font">
                             <p>Imagine you are faced with the following choice. Please select the option you would prefer:</p>
                         </div>
                         
