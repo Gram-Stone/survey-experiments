@@ -31,7 +31,7 @@ async function handleExperimentStart(req, res) {
   console.log('Full URL:', req.url);
   
   // Try to get parameters from both query and body
-  let { workerId, assignmentId, hitId, experiment } = req.query;
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
   
   // If not in query, try body (POST data)
   if (!workerId && req.body) {
@@ -39,6 +39,7 @@ async function handleExperimentStart(req, res) {
     assignmentId = req.body.assignmentId || assignmentId;
     hitId = req.body.hitId || hitId;
     experiment = req.body.experiment || experiment;
+    turkSubmitTo = req.body.turkSubmitTo || turkSubmitTo;
   }
   
   console.log('Extracted parameters:', { workerId, assignmentId, hitId, experiment });
@@ -119,6 +120,7 @@ async function handleExperimentStart(req, res) {
   req.session.workerId = workerId;
   req.session.assignmentId = assignmentId;
   req.session.hitId = hitId;
+  req.session.turkSubmitTo = turkSubmitTo;
   req.session.startTime = new Date();
 
   // Only assign font/attribution conditions for fluency intervention experiments
@@ -300,7 +302,8 @@ router.get('/complete', async (req, res) => {
     res.render('complete', { 
       completionCode,
       assignmentId: completionInfo.assignmentId,
-      hitId: completionInfo.hitId
+      hitId: completionInfo.hitId,
+      turkSubmitTo: req.session.turkSubmitTo || 'https://workersandbox.mturk.com'
     });
     
   } catch (error) {

@@ -31,7 +31,17 @@
                 
                 <div class="amt-submission">
                     <h3>Submit to Amazon Mechanical Turk:</h3>
-                    <p>To complete your participation and receive payment, please return to the Amazon Mechanical Turk page and submit your HIT using the completion code above.</p>
+                    <p>To complete your participation and receive payment, click the button below to submit your HIT to Amazon Mechanical Turk:</p>
+                    
+                    <form action="<%= turkSubmitTo %>/mturk/externalSubmit" method="POST" style="margin: 20px 0;">
+                        <input type="hidden" name="assignmentId" value="<%= assignmentId %>">
+                        <input type="hidden" name="completionCode" value="<%= completionCode %>">
+                        <button type="submit" class="btn btn-primary" style="font-size: 16px; padding: 12px 24px;">
+                            Submit HIT to Amazon Mechanical Turk
+                        </button>
+                    </form>
+                    
+                    <p><em>Note: If the button above doesn't work, you can manually return to the Amazon Mechanical Turk page and submit your HIT using the completion code above.</em></p>
                 </div>
                 
                 <div class="thank-you">
