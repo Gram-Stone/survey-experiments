@@ -15,7 +15,7 @@
         <% } %>
     </div>
     
-    <form method="POST" action="/experiment">
+    <form method="POST" action="/experiment" onsubmit="this.action = '/experiment' + window.location.search; return true;">
         <div class="decision-content">
             <h3><%= experiment.decision.title %></h3>
             

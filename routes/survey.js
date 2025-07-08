@@ -238,7 +238,37 @@ router.get('/experiment', (req, res) => {
 
 // Handle experiment form submission
 router.post('/experiment', (req, res) => {
+  console.log('POST /experiment - URL params:', req.query);
+  console.log('POST /experiment - Session data:', {
+    sessionId: req.sessionID,
+    workerId: req.session.workerId,
+    experimentId: req.session.experimentId
+  });
+  
+  // Try to get parameters from URL if session is empty
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (!req.session.workerId && workerId && assignmentId && hitId && experiment) {
+    console.log('POST experiment session empty, reinitializing from URL parameters');
+    
+    // Reinitialize session from URL parameters
+    req.session.workerId = workerId;
+    req.session.assignmentId = assignmentId;
+    req.session.hitId = hitId;
+    req.session.experimentId = experiment;
+    req.session.turkSubmitTo = turkSubmitTo;
+    
+    // Only assign font/attribution conditions for fluency intervention experiments
+    if (experiment !== 'font-pretest') {
+      const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+      req.session.fontCondition = fontCondition;
+      req.session.attributionCondition = attributionCondition;
+    }
+  }
+  
   if (!req.session.workerId || !req.session.experimentId) {
+    console.log('No workerId or experimentId in POST experiment, redirecting to home');
     return res.redirect('/');
   }
   
@@ -306,7 +336,37 @@ router.get('/demographics', (req, res) => {
 
 // Handle demographics form submission
 router.post('/demographics', (req, res) => {
-  if (!req.session.workerId || !req.session.choice) {
+  console.log('POST /demographics - URL params:', req.query);
+  console.log('POST /demographics - Session data:', {
+    sessionId: req.sessionID,
+    workerId: req.session.workerId,
+    choice: req.session.choice
+  });
+  
+  // Try to get parameters from URL if session is empty
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (!req.session.workerId && workerId && assignmentId && hitId && experiment) {
+    console.log('POST demographics session empty, reinitializing from URL parameters');
+    
+    // Reinitialize session from URL parameters
+    req.session.workerId = workerId;
+    req.session.assignmentId = assignmentId;
+    req.session.hitId = hitId;
+    req.session.experimentId = experiment;
+    req.session.turkSubmitTo = turkSubmitTo;
+    
+    // Only assign font/attribution conditions for fluency intervention experiments
+    if (experiment !== 'font-pretest') {
+      const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+      req.session.fontCondition = fontCondition;
+      req.session.attributionCondition = attributionCondition;
+    }
+  }
+  
+  if (!req.session.workerId) {
+    console.log('No workerId in POST demographics, redirecting to home');
     return res.redirect('/');
   }
   

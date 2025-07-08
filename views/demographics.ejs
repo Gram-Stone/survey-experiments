@@ -26,7 +26,7 @@
                     <p>Please provide some basic information about yourself. This information helps us understand our study participants and is kept completely confidential.</p>
                 </div>
                 
-                <form method="POST" action="/demographics">
+                <form method="POST" action="/demographics" onsubmit="this.action = '/demographics' + window.location.search; return true;">
                     <div class="form-group">
                         <label for="age">Age:</label>
                         <input type="number" id="age" name="age" min="18" max="120" required>
