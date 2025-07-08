@@ -2,7 +2,7 @@ import express from 'express';
 import Response from '../models/response.js';
 import ExperimentControl from '../models/experimentControl.js';
 import experimentLoader from '../lib/experimentLoader.js';
-import { handleExperimentCompletion } from '../lib/amtIntegration.js';
+import { handleExperimentCompletion, createHit } from '../lib/amtIntegration.js';
 
 const router = express.Router();
 
@@ -377,6 +377,34 @@ router.get('/amt-parameters/:experimentId', async (req, res) => {
   } catch (error) {
     console.error('Error generating AMT parameters:', error);
     res.status(500).json({ error: 'Error generating AMT parameters' });
+  }
+});
+
+// Create HIT endpoint
+router.post('/create-hit/:experimentId', async (req, res) => {
+  try {
+    const { experimentId } = req.params;
+    const experimentConfig = experimentLoader.loadExperiment(experimentId);
+    
+    const hit = await createHit(experimentConfig);
+    
+    if (hit) {
+      res.json({
+        success: true,
+        hitId: hit.HITId,
+        hitTypeId: hit.HITTypeId,
+        previewUrl: `https://workersandbox.mturk.com/mturk/preview?groupId=${hit.HITTypeId}`,
+        message: 'HIT created successfully'
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create HIT - check logs for manual creation instructions'
+      });
+    }
+  } catch (error) {
+    console.error('Error creating HIT:', error);
+    res.status(500).json({ error: 'Error creating HIT' });
   }
 });
 
