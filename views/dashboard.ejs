@@ -115,6 +115,39 @@
             font-size: 0.9em;
             margin-top: 10px;
         }
+        
+        .create-hit-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .create-hit-btn:hover {
+            background-color: #218838;
+        }
+        
+        .create-hit-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .hit-result-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .hit-result-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -169,10 +202,27 @@
         <% }) %>
         
         <div class="experiment-card">
-            <h3>AMT Integration</h3>
+            <h3>🚀 Create MTurk HITs</h3>
+            <p>Create HITs directly using the MTurk API with ExternalQuestion format:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                <button onclick="createHit('font-pretest')" class="create-hit-btn">
+                    Create Font Pretest HIT
+                </button>
+                <button onclick="createHit('novemsky2007')" class="create-hit-btn">
+                    Create Novemsky 2007 HIT
+                </button>
+                <button onclick="createHit('allais-paradox')" class="create-hit-btn">
+                    Create Allais Paradox HIT
+                </button>
+            </div>
+            <div id="hit-result" style="margin-top: 15px; padding: 10px; border-radius: 5px; display: none;"></div>
+        </div>
+        
+        <div class="experiment-card">
+            <h3>📊 AMT Integration</h3>
             <p><strong>HIT Parameters:</strong> GET /amt-parameters/{experimentId}</p>
             <p><strong>Manual HIT Expiration:</strong> POST /expire-hit</p>
-            <p><strong>AMT HIT Creation Links:</strong></p>
+            <p><strong>AMT HIT Creation Links (Manual):</strong></p>
             <ul>
                 <li><a href="/amt-parameters/font-pretest" target="_blank">Font Pretest HIT Parameters</a></li>
                 <li><a href="/amt-parameters/novemsky2007" target="_blank">Novemsky 2007 HIT Parameters</a></li>
@@ -192,5 +242,60 @@
             </ul>
         </div>
     </div>
+    
+    <script>
+        async function createHit(experimentId) {
+            const button = event.target;
+            const originalText = button.textContent;
+            const resultDiv = document.getElementById('hit-result');
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.textContent = 'Creating HIT...';
+            
+            try {
+                const response = await fetch(`/create-hit/${experimentId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                // Show result
+                resultDiv.style.display = 'block';
+                
+                if (result.success) {
+                    resultDiv.className = 'hit-result-success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ HIT Created Successfully!</strong><br>
+                        <strong>HIT ID:</strong> ${result.hitId}<br>
+                        <strong>Preview URL:</strong> <a href="${result.previewUrl}" target="_blank">${result.previewUrl}</a><br>
+                        <em>Workers can now find and accept this HIT on MTurk.</em>
+                    `;
+                } else {
+                    resultDiv.className = 'hit-result-error';
+                    resultDiv.innerHTML = `
+                        <strong>❌ Failed to create HIT</strong><br>
+                        ${result.message}<br>
+                        <em>Check the server logs for manual creation instructions.</em>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'hit-result-error';
+                resultDiv.innerHTML = `
+                    <strong>❌ Error creating HIT</strong><br>
+                    ${error.message}<br>
+                    <em>Make sure your AWS credentials are configured in the environment variables.</em>
+                `;
+            } finally {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+    </script>
 </body>
 </html>
