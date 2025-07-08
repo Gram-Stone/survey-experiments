@@ -273,14 +273,14 @@ router.post('/experiment', (req, res) => {
   }
   
   const { choice } = req.body;
-  const experiment = experimentLoader.loadExperiment(req.session.experimentId);
+  const experimentConfig = experimentLoader.loadExperiment(req.session.experimentId);
   const validChoices = experimentLoader.getValidChoices(req.session.experimentId);
   
   if (!choice || !validChoices.includes(choice)) {
     return res.render('experiment-dynamic', { 
       fontCondition: req.session.fontCondition,
       attributionCondition: req.session.attributionCondition,
-      experiment: experiment,
+      experiment: experimentConfig,
       error: 'Please select an option before continuing.'
     });
   }
