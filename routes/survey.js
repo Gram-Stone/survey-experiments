@@ -22,13 +22,26 @@ function getClientIP(req) {
          (req.connection.socket ? req.connection.socket.remoteAddress : null);
 }
 
-// Experiment selection page
-router.get('/', async (req, res) => {
-  // Debug: log all query parameters
-  console.log('All query parameters:', req.query);
+// Experiment selection page - handle both GET and POST
+async function handleExperimentStart(req, res) {
+  // Debug: log all parameters
+  console.log('Query parameters:', req.query);
+  console.log('Body parameters:', req.body);
+  console.log('Headers:', req.headers);
   console.log('Full URL:', req.url);
   
-  const { workerId, assignmentId, hitId, experiment } = req.query;
+  // Try to get parameters from both query and body
+  let { workerId, assignmentId, hitId, experiment } = req.query;
+  
+  // If not in query, try body (POST data)
+  if (!workerId && req.body) {
+    workerId = req.body.workerId || workerId;
+    assignmentId = req.body.assignmentId || assignmentId;
+    hitId = req.body.hitId || hitId;
+    experiment = req.body.experiment || experiment;
+  }
+  
+  console.log('Extracted parameters:', { workerId, assignmentId, hitId, experiment });
   
   // If no experiment specified
   if (!experiment) {
@@ -122,7 +135,11 @@ router.get('/', async (req, res) => {
     hitId, 
     fontCondition: req.session.fontCondition 
   });
-});
+}
+
+// Add both GET and POST routes for experiment start
+router.get('/', handleExperimentStart);
+router.post('/', handleExperimentStart);
 
 // Instructions page
 router.get('/instructions', (req, res) => {
