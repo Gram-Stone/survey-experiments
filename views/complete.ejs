@@ -34,7 +34,7 @@
                     <p>To complete your participation and receive payment, please return to the Amazon Mechanical Turk page and submit your HIT with the completion code above.</p>
                     
                     <div class="submission-form">
-                        <form action="https://www.mturk.com/mturk/externalSubmit" method="POST">
+                        <form action="<%= assignmentId.includes('SANDBOX') || assignmentId === 'REAL_ASSIGNMENT' ? 'https://workersandbox.mturk.com/mturk/externalSubmit' : 'https://www.mturk.com/mturk/externalSubmit' %>" method="POST">
                             <input type="hidden" name="assignmentId" value="<%= assignmentId %>">
                             <input type="hidden" name="completion_code" value="<%= completionCode %>">
                             <button type="submit" class="btn btn-success">Submit HIT</button>
