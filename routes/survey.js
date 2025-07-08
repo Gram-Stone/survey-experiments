@@ -24,6 +24,10 @@ function getClientIP(req) {
 
 // Experiment selection page
 router.get('/', async (req, res) => {
+  // Debug: log all query parameters
+  console.log('All query parameters:', req.query);
+  console.log('Full URL:', req.url);
+  
   const { workerId, assignmentId, hitId, experiment } = req.query;
   
   // If no experiment specified
