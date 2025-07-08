@@ -237,7 +237,7 @@ router.get('/experiment', (req, res) => {
 });
 
 // Handle experiment form submission
-router.post('/experiment', (req, res) => {
+router.post('/experiment', async (req, res) => {
   console.log('POST /experiment - URL params:', req.query);
   console.log('POST /experiment - Session data:', {
     sessionId: req.sessionID,
@@ -287,6 +287,27 @@ router.post('/experiment', (req, res) => {
   
   req.session.choice = choice;
   
+  // Store choice in database immediately to survive session loss
+  try {
+    await Response.findOneAndUpdate(
+      { workerId: req.session.workerId },
+      { 
+        workerId: req.session.workerId,
+        assignmentId: req.session.assignmentId,
+        hitId: req.session.hitId,
+        experimentId: req.session.experimentId,
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        choice: choice,
+        ipAddress: getClientIP(req)
+      },
+      { upsert: true, new: true }
+    );
+    console.log('Saved choice to database:', choice);
+  } catch (error) {
+    console.error('Error saving choice:', error);
+  }
+  
   // Preserve URL parameters in redirect
   const queryString = new URLSearchParams(req.query).toString();
   const redirectUrl = queryString ? `/demographics?${queryString}` : '/demographics';
@@ -335,7 +356,7 @@ router.get('/demographics', (req, res) => {
 });
 
 // Handle demographics form submission
-router.post('/demographics', (req, res) => {
+router.post('/demographics', async (req, res) => {
   console.log('POST /demographics - URL params:', req.query);
   console.log('POST /demographics - Session data:', {
     sessionId: req.sessionID,
@@ -382,6 +403,21 @@ router.post('/demographics', (req, res) => {
   req.session.age = parseInt(age);
   req.session.education = education;
   
+  // Store demographics in database immediately to survive session loss
+  try {
+    await Response.findOneAndUpdate(
+      { workerId: req.session.workerId },
+      { 
+        age: parseInt(age),
+        education: education
+      },
+      { upsert: true, new: true }
+    );
+    console.log('Saved demographics to database:', { age, education });
+  } catch (error) {
+    console.error('Error saving demographics:', error);
+  }
+  
   // Preserve URL parameters in redirect
   const queryString = new URLSearchParams(req.query).toString();
   const redirectUrl = queryString ? `/complete?${queryString}` : '/complete';
@@ -426,62 +462,95 @@ router.get('/complete', async (req, res) => {
     return res.redirect('/');
   }
   
-  // Check if we have all required data
-  if (!req.session.choice || !req.session.age || !req.session.education) {
-    console.log('Missing required session data:', {
-      choice: !!req.session.choice,
-      age: !!req.session.age,
-      education: !!req.session.education
-    });
-    return res.render('error', { 
-      message: 'Session data incomplete. Please restart the study from the beginning.' 
-    });
-  }
-  
   try {
-    // Check if worker has already completed any experiment
-    const existingResponse = await Response.findOne({ workerId: req.session.workerId });
-    if (existingResponse) {
+    // Get existing partial response from database (should exist from previous form submissions)
+    let existingResponse = await Response.findOne({ workerId: req.session.workerId });
+    
+    if (existingResponse && existingResponse.completionCode) {
+      // Worker has already completed - show error
       return res.render('error', { 
         message: 'You have already participated in one of our studies. Thank you for your interest, but you cannot participate in multiple studies.' 
+      });
+    }
+    
+    if (!existingResponse) {
+      // No partial data found - this shouldn't happen but handle gracefully
+      console.log('No existing response found, creating new one');
+      existingResponse = new Response({
+        workerId: req.session.workerId,
+        assignmentId: req.session.assignmentId,
+        hitId: req.session.hitId,
+        experimentId: req.session.experimentId,
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        ipAddress: getClientIP(req)
+      });
+    }
+    
+    // Check if we have all required data (either from session or database)
+    const choice = req.session.choice || existingResponse.choice;
+    const age = req.session.age || existingResponse.age;
+    const education = req.session.education || existingResponse.education;
+    
+    if (!choice || !age || !education) {
+      console.log('Missing required data:', {
+        choice: !!choice,
+        age: !!age,
+        education: !!education,
+        sessionData: {
+          choice: !!req.session.choice,
+          age: !!req.session.age,
+          education: !!req.session.education
+        },
+        dbData: {
+          choice: !!existingResponse.choice,
+          age: !!existingResponse.age,
+          education: !!existingResponse.education
+        }
+      });
+      return res.render('error', { 
+        message: 'Study data incomplete. Please restart the study from the beginning.' 
       });
     }
 
     // Generate completion code
     const completionCode = generateCompletionCode();
     
-    // Save response to database
-    const response = new Response({
-      workerId: req.session.workerId,
-      assignmentId: req.session.assignmentId,
-      hitId: req.session.hitId,
-      experimentId: req.session.experimentId,
-      fontCondition: req.session.fontCondition,
-      attributionCondition: req.session.attributionCondition,
-      choice: req.session.choice,
-      age: req.session.age,
-      education: req.session.education,
-      completionCode: completionCode,
-      ipAddress: getClientIP(req)
-    });
-    
-    await response.save();
+    // Complete the response with all data and completion code
+    const completedResponse = await Response.findOneAndUpdate(
+      { workerId: req.session.workerId },
+      {
+        workerId: req.session.workerId,
+        assignmentId: req.session.assignmentId,
+        hitId: req.session.hitId,
+        experimentId: req.session.experimentId,
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        choice: choice,
+        age: age,
+        education: education,
+        completionCode: completionCode,
+        ipAddress: getClientIP(req)
+      },
+      { upsert: true, new: true }
+    );
+    console.log('Completed response saved:', completedResponse._id);
     
     // Update experiment control count and check if we need to stop the experiment
     const controlStatus = await ExperimentControl.incrementCount(
-      req.session.experimentId,
-      req.session.fontCondition
+      req.session.experimentId || completedResponse.experimentId,
+      req.session.fontCondition || completedResponse.fontCondition
     );
     
     // If experiment just reached completion, trigger HIT management
     if (controlStatus && !controlStatus.isActive && controlStatus.completedAt) {
-      console.log(`Experiment ${req.session.experimentId} has reached target sample size. Triggering HIT management...`);
+      console.log(`Experiment ${req.session.experimentId || completedResponse.experimentId} has reached target sample size. Triggering HIT management...`);
       
       // Try to expire the HIT on AMT
       try {
         await handleExperimentCompletion(
-          req.session.hitId, 
-          req.session.experimentId, 
+          req.session.hitId || completedResponse.hitId, 
+          req.session.experimentId || completedResponse.experimentId, 
           controlStatus.targetSampleSize
         );
       } catch (error) {
@@ -493,8 +562,8 @@ router.get('/complete', async (req, res) => {
     // Store completion info before destroying session
     const completionInfo = {
       completionCode,
-      assignmentId: req.session.assignmentId,
-      hitId: req.session.hitId,
+      assignmentId: req.session.assignmentId || completedResponse.assignmentId,
+      hitId: req.session.hitId || completedResponse.hitId,
       turkSubmitTo: req.session.turkSubmitTo || 'https://workersandbox.mturk.com'
     };
     
