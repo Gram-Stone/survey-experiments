@@ -145,7 +145,15 @@ router.post('/', handleExperimentStart);
 
 // Instructions page
 router.get('/instructions', (req, res) => {
+  console.log('Instructions page - Session data:', {
+    sessionId: req.sessionID,
+    workerId: req.session.workerId,
+    experimentId: req.session.experimentId,
+    nodeEnv: process.env.NODE_ENV
+  });
+  
   if (!req.session.workerId) {
+    console.log('No workerId in session, redirecting to home');
     return res.redirect('/');
   }
   
