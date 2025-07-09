@@ -144,6 +144,53 @@ PORT=3000
 - No duplicate prevention beyond basic session handling
 - Pilot-focused architecture (extensible to full studies)
 
+## Planned Research Dashboard
+**Future admin interface** for comprehensive experiment management:
+
+### Core Dashboard Features
+**Experiment Batch Management:**
+- Create experiment batches with configurable parameters (sample size, conditions, duration)
+- Template-based experiment creation from existing modules
+- Batch scheduling and automated AMT HIT posting
+- Pause/resume/cancel batch operations
+
+**Cost & Power Controls:**
+- AMT cost calculator with reward × participants × fees
+- Budget limits with automatic experiment stopping
+- Statistical power analysis with effect size estimates
+- Sample size recommendations based on expected effects
+
+**Analysis & Reporting:**
+- Real-time results as data streams in
+- Automated statistical tests (chi-square, t-tests, effect sizes)
+- Visual dashboards with charts and progress bars
+- Export to multiple formats (CSV, JSON, LaTeX tables, APA format)
+
+### Additional Features
+**Quality Control:**
+- Participant screening and exclusion criteria
+- Attention checks and response time validation
+- Duplicate participant detection
+- Data quality flags and manual review queues
+
+**Monitoring & Alerts:**
+- Live experiment progress tracking
+- Email/SMS alerts for completion milestones
+- Error monitoring and automatic retries
+- AMT approval/rejection management
+
+**Research Operations:**
+- Experiment comparison tools
+- Meta-analysis across studies
+- Participant database with performance history
+- Automated literature citation generation
+
+**Administrative:**
+- User roles for research teams
+- Audit logs for data integrity
+- Backup and data retention policies
+- Integration with institutional systems
+
 ## Data Analysis System
 Built-in analysis system using functional programming approach (no external statistics packages):
 
