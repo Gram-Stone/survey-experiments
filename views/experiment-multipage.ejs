@@ -546,32 +546,14 @@
                 }
                 
                 const result = await response.json();
-                document.getElementById('completion-code').textContent = result.completionCode;
-                document.getElementById('form-completion-code').value = result.completionCode;
-                document.getElementById('manual-code').textContent = result.completionCode;
                 
-                // Set up AMT form submission with protocol consistency fix
-                const form = document.getElementById('amt-form');
-                
-                // Ensure HTTPS protocol consistency for MTurk submission
-                let submitUrl;
-                if (turkSubmitTo) {
-                    // Ensure turkSubmitTo uses HTTPS
-                    submitUrl = turkSubmitTo.replace(/^http:/, 'https:') + '/mturk/externalSubmit';
+                // Redirect to legacy completion page (proven to work)
+                if (result.redirectTo) {
+                    window.location.href = result.redirectTo;
                 } else {
-                    submitUrl = 'https://workersandbox.mturk.com/mturk/externalSubmit';
+                    // Fallback - shouldn't happen
+                    showError('Completion processing failed. Please contact researcher.');
                 }
-                
-                form.action = submitUrl;
-                
-                // Simple submission handling - no automatic redirects
-                form.addEventListener('submit', function(e) {
-                    console.log('Form submitting to:', form.action);
-                    // Show manual instructions only if form submission fails
-                    setTimeout(() => {
-                        document.getElementById('submission-instructions').style.display = 'block';
-                    }, 8000);
-                });
                 
             } catch (error) {
                 console.error('Error during completion:', error);

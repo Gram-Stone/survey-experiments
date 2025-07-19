@@ -885,11 +885,10 @@ router.post('/api/submit-multipage', async (req, res) => {
       console.error('Error updating experiment control:', error);
     }
     
+    // Instead of JSON response, redirect to legacy completion page
     res.json({ 
       success: true, 
-      completionCode,
-      failed: failed,
-      failureReasons: failureReasons
+      redirectTo: `/complete?workerId=${workerId}&assignmentId=${assignmentId}&hitId=${hitId}&experiment=${experimentId}`
     });
     
   } catch (error) {
