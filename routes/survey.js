@@ -27,7 +27,8 @@ async function handleRootRequest(req, res) {
   // Check if this is an experiment access with MTurk parameters
   const { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
   
-  if (experiment && workerId && assignmentId && hitId) {
+  // Handle MTurk experiment access (including preview mode)
+  if (experiment && (workerId || assignmentId || hitId)) {
     // Redirect to experiment start with parameters
     return handleExperimentStart(req, res);
   }
@@ -145,12 +146,10 @@ async function handleExperimentStart(req, res) {
   req.session.turkSubmitTo = turkSubmitTo;
   req.session.startTime = new Date();
 
-  // Only assign font/attribution conditions for fluency intervention experiments
+  // Only assign font condition for fluency intervention experiments
   if (experiment !== 'font-pretest') {
     const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-    const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
     req.session.fontCondition = fontCondition;
-    req.session.attributionCondition = attributionCondition;
   }
 
   // For multi-page experiments, go directly to experiment
@@ -158,7 +157,6 @@ async function handleExperimentStart(req, res) {
   if (experimentConfig.multiPage) {
     return res.render('experiment-multipage', { 
       fontCondition: req.session.fontCondition,
-      attributionCondition: req.session.attributionCondition,
       experiment: experimentConfig,
       workerId: req.session.workerId,
       assignmentId: req.session.assignmentId,
@@ -202,12 +200,10 @@ router.get('/instructions', async (req, res) => {
     req.session.experimentId = experiment;
     req.session.turkSubmitTo = turkSubmitTo;
     
-    // Only assign font/attribution conditions for fluency intervention experiments
+    // Only assign font condition for fluency intervention experiments
     if (experiment !== 'font-pretest') {
       const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
       req.session.fontCondition = fontCondition;
-      req.session.attributionCondition = attributionCondition;
     }
   }
   
@@ -243,12 +239,10 @@ router.get('/experiment', (req, res) => {
     req.session.experimentId = experiment;
     req.session.turkSubmitTo = turkSubmitTo;
     
-    // Only assign font/attribution conditions for fluency intervention experiments
+    // Only assign font condition for fluency intervention experiments
     if (experiment !== 'font-pretest') {
       const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
       req.session.fontCondition = fontCondition;
-      req.session.attributionCondition = attributionCondition;
     }
   }
   
@@ -264,7 +258,6 @@ router.get('/experiment', (req, res) => {
     if (experiment.multiPage) {
       res.render('experiment-multipage', { 
         fontCondition: req.session.fontCondition,
-        attributionCondition: req.session.attributionCondition,
         experiment: experiment,
         workerId: req.session.workerId,
         assignmentId: req.session.assignmentId,
@@ -274,7 +267,6 @@ router.get('/experiment', (req, res) => {
     } else {
       res.render('experiment-dynamic', { 
         fontCondition: req.session.fontCondition,
-        attributionCondition: req.session.attributionCondition,
         experiment: experiment
       });
     }
@@ -307,12 +299,10 @@ router.post('/experiment', async (req, res) => {
     req.session.experimentId = experiment;
     req.session.turkSubmitTo = turkSubmitTo;
     
-    // Only assign font/attribution conditions for fluency intervention experiments
+    // Only assign font condition for fluency intervention experiments
     if (experiment !== 'font-pretest') {
       const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
       req.session.fontCondition = fontCondition;
-      req.session.attributionCondition = attributionCondition;
     }
   }
   
@@ -328,7 +318,6 @@ router.post('/experiment', async (req, res) => {
   if (!choice || !validChoices.includes(choice)) {
     return res.render('experiment-dynamic', { 
       fontCondition: req.session.fontCondition,
-      attributionCondition: req.session.attributionCondition,
       experiment: experimentConfig,
       error: 'Please select an option before continuing.'
     });
@@ -346,7 +335,6 @@ router.post('/experiment', async (req, res) => {
         hitId: req.session.hitId,
         experimentId: req.session.experimentId,
         fontCondition: req.session.fontCondition,
-        attributionCondition: req.session.attributionCondition,
         choice: choice,
         ipAddress: getClientIP(req)
       },
@@ -385,12 +373,10 @@ router.get('/demographics', (req, res) => {
     req.session.experimentId = experiment;
     req.session.turkSubmitTo = turkSubmitTo;
     
-    // Only assign font/attribution conditions for fluency intervention experiments
+    // Only assign font condition for fluency intervention experiments
     if (experiment !== 'font-pretest') {
       const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
       req.session.fontCondition = fontCondition;
-      req.session.attributionCondition = attributionCondition;
     }
   }
   
@@ -426,12 +412,10 @@ router.post('/demographics', async (req, res) => {
     req.session.experimentId = experiment;
     req.session.turkSubmitTo = turkSubmitTo;
     
-    // Only assign font/attribution conditions for fluency intervention experiments
+    // Only assign font condition for fluency intervention experiments
     if (experiment !== 'font-pretest') {
       const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
       req.session.fontCondition = fontCondition;
-      req.session.attributionCondition = attributionCondition;
     }
   }
   
@@ -497,12 +481,10 @@ router.get('/complete', async (req, res) => {
     req.session.experimentId = experiment;
     req.session.turkSubmitTo = turkSubmitTo;
     
-    // Only assign font/attribution conditions for fluency intervention experiments
+    // Only assign font condition for fluency intervention experiments
     if (experiment !== 'font-pretest') {
       const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
-      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
       req.session.fontCondition = fontCondition;
-      req.session.attributionCondition = attributionCondition;
     }
   }
   
@@ -531,7 +513,6 @@ router.get('/complete', async (req, res) => {
         hitId: req.session.hitId,
         experimentId: req.session.experimentId,
         fontCondition: req.session.fontCondition,
-        attributionCondition: req.session.attributionCondition,
         ipAddress: getClientIP(req)
       });
     }
@@ -574,7 +555,6 @@ router.get('/complete', async (req, res) => {
         hitId: req.session.hitId,
         experimentId: req.session.experimentId,
         fontCondition: req.session.fontCondition,
-        attributionCondition: req.session.attributionCondition,
         choice: choice,
         age: age,
         education: education,
@@ -830,7 +810,7 @@ router.post('/reject-assignment', async (req, res) => {
 // API endpoint for multi-page experiment submission
 router.post('/api/submit-multipage', async (req, res) => {
   try {
-    const { workerId, assignmentId, hitId, experimentId, fontCondition, attributionCondition, responses, completionTimeMs, startTime, endTime } = req.body;
+    const { workerId, assignmentId, hitId, experimentId, fontCondition, responses, completionTimeMs, startTime, endTime } = req.body;
     
     if (!workerId || !assignmentId || !hitId || !experimentId || !responses) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -871,12 +851,15 @@ router.post('/api/submit-multipage', async (req, res) => {
       hitId,
       experimentId,
       fontCondition,
-      attributionCondition,
       choice: responses.lottery1 || 'N/A',
       allResponses: {
         lottery1: responses.lottery1,
         lottery2: responses.lottery2,
         math: responses.math,
+        attention: responses.attention,
+        brand: responses.brand,
+        weather: responses.weather,
+        education: responses.education,
         _failed: responses._failed,
         _failureReasons: responses._failureReasons,
         completionTimeMs: completionTimeMs,

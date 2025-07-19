@@ -24,11 +24,6 @@ const responseSchema = new mongoose.Schema({
     enum: ['easy', 'hard'],
     required: true
   },
-  attributionCondition: {
-    type: String,
-    enum: ['present', 'absent'],
-    required: true
-  },
   choice: {
     type: String,
     required: false // Make optional for multi-page experiments
@@ -70,6 +65,6 @@ const responseSchema = new mongoose.Schema({
 
 // Indexes for efficient querying
 responseSchema.index({ workerId: 1, assignmentId: 1 });
-responseSchema.index({ experimentId: 1, fontCondition: 1, attributionCondition: 1 });
+responseSchema.index({ experimentId: 1, fontCondition: 1 });
 
 export default mongoose.model('Response', responseSchema);

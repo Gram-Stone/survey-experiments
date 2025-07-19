@@ -29,7 +29,7 @@
                 </div>
                 
                 <div style="text-align: center; margin-top: 30px;">
-                    <form action="<%= turkSubmitTo || 'https://workersandbox.mturk.com' %>/mturk/externalSubmit" method="POST" target="_parent">
+                    <form id="amt-form" action="<%= turkSubmitTo || 'https://workersandbox.mturk.com' %>/mturk/externalSubmit" method="POST" target="_top">
                         <input type="hidden" name="assignmentId" value="<%= assignmentId %>">
                         <input type="hidden" name="completion_code" value="<%= completionCode %>">
                         <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer;">
@@ -37,7 +37,50 @@
                         </button>
                     </form>
                     <p style="margin-top: 10px; color: #666; font-size: 14px;">Click the button above to submit your work and receive payment.</p>
+                    
+                    <div id="submission-instructions" style="display: none; margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
+                        <p><strong>If the submission button doesn't work:</strong></p>
+                        <ol style="text-align: left; margin: 10px 0;">
+                            <li>Copy your completion code: <strong><%= completionCode %></strong></li>
+                            <li>Close this tab/window</li>
+                            <li>Return to the MTurk interface</li>
+                            <li>Paste the completion code in the provided field</li>
+                            <li>Submit your assignment</li>
+                        </ol>
+                    </div>
                 </div>
+                
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const form = document.getElementById('amt-form');
+                    
+                    // Add form submission handler
+                    form.addEventListener('submit', function(e) {
+                        // Show manual instructions after a delay if submission seems stuck
+                        setTimeout(() => {
+                            document.getElementById('submission-instructions').style.display = 'block';
+                        }, 3000);
+                    });
+                    
+                    // Try automatic submission after a short delay if in iframe
+                    setTimeout(() => {
+                        if (window.parent !== window) {
+                            // We're in an iframe, try to break out
+                            try {
+                                const formData = new FormData(form);
+                                const params = new URLSearchParams();
+                                for (let [key, value] of formData) {
+                                    params.append(key, value);
+                                }
+                                window.top.location.href = form.action + '?' + params.toString();
+                            } catch (e) {
+                                // If that fails, show manual instructions
+                                document.getElementById('submission-instructions').style.display = 'block';
+                            }
+                        }
+                    }, 1000);
+                });
+                </script>
                 
                 <div class="thank-you">
                     <h3>Thank You!</h3>
