@@ -62,23 +62,12 @@
                         }, 3000);
                     });
                     
-                    // Try automatic submission after a short delay if in iframe
-                    setTimeout(() => {
-                        if (window.parent !== window) {
-                            // We're in an iframe, try to break out
-                            try {
-                                const formData = new FormData(form);
-                                const params = new URLSearchParams();
-                                for (let [key, value] of formData) {
-                                    params.append(key, value);
-                                }
-                                window.top.location.href = form.action + '?' + params.toString();
-                            } catch (e) {
-                                // If that fails, show manual instructions
-                                document.getElementById('submission-instructions').style.display = 'block';
-                            }
-                        }
-                    }, 1000);
+                    // Show manual instructions if in iframe (common issue)
+                    if (window.parent !== window) {
+                        setTimeout(() => {
+                            document.getElementById('submission-instructions').style.display = 'block';
+                        }, 3000);
+                    }
                 });
                 </script>
                 
