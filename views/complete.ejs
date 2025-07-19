@@ -20,91 +20,29 @@
                     <p>Thank you for participating in our research study! Your responses have been recorded successfully.</p>
                 </div>
                 
-                <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
-                    <h3 style="color: #155724; margin-top: 0;">Your Completion Code:</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #155724; background-color: white; padding: 10px; border: 2px solid #28a745; border-radius: 5px; margin: 10px 0;">
-                        <span id="completion-code"><%= completionCode %></span>
-                        <button type="button" class="copy-btn" onclick="copyToClipboard()" style="margin-left: 10px; padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">📋 Copy</button>
+                <div class="completion-code">
+                    <h3>Your Completion Code:</h3>
+                    <div class="code-display">
+                        <strong id="completion-code"><%= completionCode %></strong>
+                        <button type="button" class="copy-btn" onclick="copyToClipboard()">📋 Copy</button>
                     </div>
+                    <p>Please copy this code and paste it into the Amazon Mechanical Turk page to receive your payment.</p>
                 </div>
                 
-                <div style="text-align: center; margin-top: 30px;">
-                    <form id="amt-form" action="<%= (turkSubmitTo || 'https://workersandbox.mturk.com').replace(/\/$/, '') %>/mturk/externalSubmit" method="POST" target="_top">
+                <div class="amt-submission">
+                    <h3>Submit to Amazon Mechanical Turk:</h3>
+                    <p>To complete your participation and receive payment, click the button below to submit your HIT to Amazon Mechanical Turk:</p>
+                    
+                    <form action="<%= turkSubmitTo %>/mturk/externalSubmit" method="POST" style="margin: 20px 0;">
                         <input type="hidden" name="assignmentId" value="<%= assignmentId %>">
                         <input type="hidden" name="completionCode" value="<%= completionCode %>">
-                        <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer;">
-                            Submit to Amazon Mechanical Turk
+                        <button type="submit" class="btn btn-primary" style="font-size: 16px; padding: 12px 24px;">
+                            Submit HIT to Amazon Mechanical Turk
                         </button>
                     </form>
-                    <p style="margin-top: 10px; color: #666; font-size: 14px;">Click the button above to submit your work and receive payment.</p>
                     
-                    <div id="submission-instructions" style="display: none; margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
-                        <p><strong>If the submission button doesn't work:</strong></p>
-                        <ol style="text-align: left; margin: 10px 0;">
-                            <li>Copy your completion code: <strong><%= completionCode %></strong></li>
-                            <li>Close this tab/window</li>
-                            <li>Return to the MTurk interface</li>
-                            <li>Paste the completion code in the provided field</li>
-                            <li>Submit your assignment</li>
-                        </ol>
-                    </div>
+                    <p><em>Note: If the button above doesn't work, you can manually return to the Amazon Mechanical Turk page and submit your HIT using the completion code above.</em></p>
                 </div>
-                
-                <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const form = document.getElementById('amt-form');
-                    
-                    // Debug: Log form details
-                    console.log('Form action:', form.action);
-                    console.log('Form target:', form.target);
-                    console.log('Assignment ID:', form.querySelector('input[name="assignmentId"]').value);
-                    console.log('Window context:', {
-                        isInIframe: window.parent !== window,
-                        location: window.location.href,
-                        parentLocation: window.parent !== window ? 'iframe' : 'same'
-                    });
-                    
-                    // Add form submission handler
-                    form.addEventListener('submit', function(e) {
-                        console.log('Form submission triggered');
-                        
-                        // Try alternative submission methods if standard form submission fails
-                        setTimeout(() => {
-                            const assignmentId = form.querySelector('input[name="assignmentId"]').value;
-                            const completionCode = form.querySelector('input[name="completionCode"]').value;
-                            const submitUrl = form.action + '?assignmentId=' + assignmentId + '&completionCode=' + completionCode;
-                            
-                            console.log('Attempting manual navigation to:', submitUrl);
-                            
-                            // Try multiple approaches
-                            try {
-                                if (window.top !== window) {
-                                    // We're in an iframe, try to break out
-                                    window.top.location.href = submitUrl;
-                                } else {
-                                    // Direct navigation
-                                    window.location.href = submitUrl;
-                                }
-                            } catch (e) {
-                                console.error('Navigation failed:', e);
-                                document.getElementById('submission-instructions').style.display = 'block';
-                            }
-                        }, 1000);
-                        
-                        // Show manual instructions after a delay if submission seems stuck
-                        setTimeout(() => {
-                            document.getElementById('submission-instructions').style.display = 'block';
-                        }, 3000);
-                    });
-                    
-                    // Show manual instructions if in iframe (common issue)
-                    if (window.parent !== window) {
-                        setTimeout(() => {
-                            document.getElementById('submission-instructions').style.display = 'block';
-                        }, 3000);
-                    }
-                });
-                </script>
                 
                 <div class="thank-you">
                     <h3>Thank You!</h3>
