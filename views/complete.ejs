@@ -31,7 +31,7 @@
                 <div style="text-align: center; margin-top: 30px;">
                     <form id="amt-form" action="<%= (turkSubmitTo || 'https://workersandbox.mturk.com').replace(/\/$/, '') %>/mturk/externalSubmit" method="POST" target="_top">
                         <input type="hidden" name="assignmentId" value="<%= assignmentId %>">
-                        <input type="hidden" name="completion_code" value="<%= completionCode %>">
+                        <input type="hidden" name="completionCode" value="<%= completionCode %>">
                         <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer;">
                             Submit to Amazon Mechanical Turk
                         </button>
@@ -71,8 +71,8 @@
                         // Try alternative submission methods if standard form submission fails
                         setTimeout(() => {
                             const assignmentId = form.querySelector('input[name="assignmentId"]').value;
-                            const completionCode = form.querySelector('input[name="completion_code"]').value;
-                            const submitUrl = form.action + '?assignmentId=' + assignmentId + '&completion_code=' + completionCode;
+                            const completionCode = form.querySelector('input[name="completionCode"]').value;
+                            const submitUrl = form.action + '?assignmentId=' + assignmentId + '&completionCode=' + completionCode;
                             
                             console.log('Attempting manual navigation to:', submitUrl);
                             
