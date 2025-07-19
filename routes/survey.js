@@ -521,12 +521,28 @@ router.get('/complete', async (req, res) => {
     }
     
     // Check if we have all required data (either from session or database)
-    const choice = req.session.choice || existingResponse.choice;
-    const age = req.session.age || existingResponse.age;
-    const education = req.session.education || existingResponse.education;
+    // For multipage experiments, check allResponses; for legacy experiments, check individual fields
+    let choice, age, education;
     
-    if (!choice || !age || !education) {
+    if (existingResponse.allResponses) {
+      // Multipage experiment - check allResponses
+      choice = existingResponse.choice || existingResponse.allResponses.lottery1;
+      age = existingResponse.allResponses.age || 25; // Default age for multipage experiments that don't collect it
+      education = existingResponse.allResponses.education || 'not_collected';
+    } else {
+      // Legacy experiment - check individual fields and session
+      choice = req.session.choice || existingResponse.choice;
+      age = req.session.age || existingResponse.age;
+      education = req.session.education || existingResponse.education;
+    }
+    
+    // For multipage experiments, only require choice (age/education are optional or defaults)
+    const isMultipage = !!existingResponse.allResponses;
+    const requiredFieldsMissing = isMultipage ? !choice : (!choice || !age || !education);
+    
+    if (requiredFieldsMissing) {
       console.log('Missing required data:', {
+        isMultipage,
         choice: !!choice,
         age: !!age,
         education: !!education,
@@ -538,7 +554,8 @@ router.get('/complete', async (req, res) => {
         dbData: {
           choice: !!existingResponse.choice,
           age: !!existingResponse.age,
-          education: !!existingResponse.education
+          education: !!existingResponse.education,
+          allResponses: !!existingResponse.allResponses
         }
       });
       return res.render('error', { 
