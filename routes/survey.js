@@ -593,7 +593,7 @@ router.get('/complete', async (req, res) => {
       completionCode,
       assignmentId: req.session.assignmentId || completedResponse.assignmentId,
       hitId: req.session.hitId || completedResponse.hitId,
-      turkSubmitTo: req.session.turkSubmitTo || 'https://workersandbox.mturk.com'
+      turkSubmitTo: (req.session.turkSubmitTo || 'https://workersandbox.mturk.com').replace(/^http:/, 'https:')
     };
     
     // Clear session

@@ -45,6 +45,16 @@ app.use(session({
   }
 }));
 
+// Force HTTPS for MTurk requests in production
+app.use((req, res, next) => {
+  // Check if we're in production and the request came via HTTP
+  if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
+    // Redirect HTTP to HTTPS for MTurk compatibility
+    return res.redirect(`https://${req.header('host')}${req.url}`);
+  }
+  next();
+});
+
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

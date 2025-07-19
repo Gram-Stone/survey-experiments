@@ -550,11 +550,18 @@
                 document.getElementById('form-completion-code').value = result.completionCode;
                 document.getElementById('manual-code').textContent = result.completionCode;
                 
-                // Set up AMT form submission (like legacy approach)
+                // Set up AMT form submission with protocol consistency fix
                 const form = document.getElementById('amt-form');
-                const submitUrl = turkSubmitTo ? 
-                    turkSubmitTo + '/mturk/externalSubmit' : 
-                    'https://workersandbox.mturk.com/mturk/externalSubmit';
+                
+                // Ensure HTTPS protocol consistency for MTurk submission
+                let submitUrl;
+                if (turkSubmitTo) {
+                    // Ensure turkSubmitTo uses HTTPS
+                    submitUrl = turkSubmitTo.replace(/^http:/, 'https:') + '/mturk/externalSubmit';
+                } else {
+                    submitUrl = 'https://workersandbox.mturk.com/mturk/externalSubmit';
+                }
+                
                 form.action = submitUrl;
                 
                 // Simple submission handling - no automatic redirects
