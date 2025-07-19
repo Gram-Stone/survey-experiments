@@ -20,28 +20,23 @@
                     <p>Thank you for participating in our research study! Your responses have been recorded successfully.</p>
                 </div>
                 
-                <div class="completion-code">
-                    <h3>Your Completion Code:</h3>
-                    <div class="code-display">
-                        <strong id="completion-code"><%= completionCode %></strong>
-                        <button type="button" class="copy-btn" onclick="copyToClipboard()">📋 Copy</button>
+                <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
+                    <h3 style="color: #155724; margin-top: 0;">Your Completion Code:</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #155724; background-color: white; padding: 10px; border: 2px solid #28a745; border-radius: 5px; margin: 10px 0;">
+                        <span id="completion-code"><%= completionCode %></span>
+                        <button type="button" class="copy-btn" onclick="copyToClipboard()" style="margin-left: 10px; padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">📋 Copy</button>
                     </div>
-                    <p>Please copy this code and paste it into the Amazon Mechanical Turk page to receive your payment.</p>
                 </div>
                 
-                <div class="amt-submission">
-                    <h3>Submit to Amazon Mechanical Turk:</h3>
-                    <p>To complete your participation and receive payment, click the button below to submit your HIT to Amazon Mechanical Turk:</p>
-                    
-                    <form action="<%= turkSubmitTo %>/mturk/externalSubmit" method="POST" style="margin: 20px 0;">
+                <div style="text-align: center; margin-top: 30px;">
+                    <form action="<%= turkSubmitTo || 'https://workersandbox.mturk.com' %>/mturk/externalSubmit" method="POST" target="_parent">
                         <input type="hidden" name="assignmentId" value="<%= assignmentId %>">
-                        <input type="hidden" name="completionCode" value="<%= completionCode %>">
-                        <button type="submit" class="btn btn-primary" style="font-size: 16px; padding: 12px 24px;">
-                            Submit HIT to Amazon Mechanical Turk
+                        <input type="hidden" name="completion_code" value="<%= completionCode %>">
+                        <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer;">
+                            Submit to Amazon Mechanical Turk
                         </button>
                     </form>
-                    
-                    <p><em>Note: If the button above doesn't work, you can manually return to the Amazon Mechanical Turk page and submit your HIT using the completion code above.</em></p>
+                    <p style="margin-top: 10px; color: #666; font-size: 14px;">Click the button above to submit your work and receive payment.</p>
                 </div>
                 
                 <div class="thank-you">

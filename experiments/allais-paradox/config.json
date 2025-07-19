@@ -1,42 +1,115 @@
 {
   "experimentId": "allais-paradox",
-  "title": "Financial Decision Study", 
-  "description": "Allais paradox with processing fluency manipulation",
-  "instructions": "Please read the following scenario carefully and choose the option you would prefer:",
-  "decision": {
-    "title": "Financial Decision Scenario",
-    "description": "Imagine you are faced with the following choice. Please select the option you would prefer:"
+  "title": "Decision Making Study", 
+  "description": "Allais paradox with processing fluency manipulation and structured page ordering",
+  "instructions": "You will be presented with various questions and scenarios. Please read each one carefully and provide your honest responses. There are no right or wrong answers - we are interested in your personal preferences and opinions.",
+  "multiPage": true,
+  "pageOrdering": {
+    "fixed": [
+      {
+        "id": "welcome",
+        "type": "info",
+        "title": "Welcome",
+        "content": "Welcome to our decision-making study. You will be asked to make investment choices and answer some survey questions. Please read each question carefully.",
+        "order": 0
+      },
+      {
+        "id": "lottery1",
+        "type": "choice",
+        "title": "Investment Decision",
+        "content": "Imagine you are choosing between two investment options. Which investment would you choose?<br><br><strong>Investment A:</strong><br>100% chance of $1,000,000<br>You receive $1 million with certainty.<br><br><strong>Investment B:</strong><br>89% chance of $1M, 10% chance of $5M, 1% chance of $0<br>Lottery with multiple possible outcomes.",
+        "choices": [
+          {"value": "A", "label": "Investment A"},
+          {"value": "B", "label": "Investment B"}
+        ],
+        "order": 1,
+        "applyFontCondition": true
+      }
+    ],
+    "randomizable": [
+      {
+        "id": "brand",
+        "type": "radio",
+        "title": "Brand Preference",
+        "content": "Which brand do you prefer for everyday products?",
+        "choices": [
+          {"value": "name_brands", "label": "Well-known name brands"},
+          {"value": "store_brands", "label": "Store brands/generics"},
+          {"value": "premium", "label": "Premium/luxury brands"},
+          {"value": "no_preference", "label": "No particular preference"},
+          {"value": "depends", "label": "It depends on the product"}
+        ],
+        "required": true
+      },
+      {
+        "id": "weather",
+        "type": "radio",
+        "title": "Weather Preference", 
+        "content": "What type of weather do you prefer?",
+        "choices": [
+          {"value": "sunny", "label": "Sunny and warm"},
+          {"value": "mild", "label": "Mild and comfortable"},
+          {"value": "cool", "label": "Cool and crisp"},
+          {"value": "rainy", "label": "Rainy and cozy"},
+          {"value": "snowy", "label": "Snowy and cold"}
+        ],
+        "required": true
+      },
+      {
+        "id": "education",
+        "type": "radio",
+        "title": "Education Level",
+        "content": "What is your highest level of education? (Optional)",
+        "choices": [
+          {"value": "less_than_hs", "label": "Less than high school"},
+          {"value": "hs_diploma", "label": "High school diploma/GED"},
+          {"value": "some_college", "label": "Some college"},
+          {"value": "associates", "label": "Associate's degree"},
+          {"value": "bachelors", "label": "Bachelor's degree"},
+          {"value": "masters", "label": "Master's degree"},
+          {"value": "doctoral", "label": "Doctoral degree"},
+          {"value": "professional", "label": "Professional degree"}
+        ],
+        "required": false
+      },
+      {
+        "id": "attention",
+        "type": "input",
+        "title": "Attention Check",
+        "content": "Please solve this simple math problem:<br><br><strong>15 + 27 = ?</strong>",
+        "inputType": "number",
+        "correctAnswer": 42,
+        "required": true
+      }
+    ],
+    "constrained": [
+      {
+        "id": "lottery2",
+        "type": "choice",
+        "title": "Investment Decision",
+        "content": "Now consider this different scenario. Which investment would you choose?<br><br><strong>Investment C:</strong><br>89% chance of $0, 11% chance of $1,000,000<br>Lottery with a chance of receiving money.<br><br><strong>Investment D:</strong><br>90% chance of $0, 10% chance of $5,000,000<br>Different lottery with a chance of receiving money.",
+        "choices": [
+          {"value": "C", "label": "Investment C"},
+          {"value": "D", "label": "Investment D"}
+        ],
+        "constraints": {
+          "minSeparationFromPage": "lottery1",
+          "minSeparationCount": 1
+        },
+        "applyFontCondition": true
+      }
+    ]
   },
-  "options": [
-    {
-      "id": "A",
-      "label": "Option A",
-      "content": [
-        "$2,400 for certain"
-      ]
-    },
-    {
-      "id": "B",
-      "label": "Option B", 
-      "content": [
-        "33% chance of $2,500",
-        "66% chance of $2,400", 
-        "1% chance of $0"
-      ]
-    }
-  ],
-  "enableDefer": false,
-  "questionText": "Which option would you prefer?",
-  "completionMessage": "Thank you for participating in our financial decision study!",
+  "completionMessage": "Thank you for participating in our study! This study tested the Allais Paradox, discovered by economist Maurice Allais. The mathematically consistent choices are either A and C together, or B and D together. However, many people choose A and D, which violates expected utility theory. We also tested whether making text harder to read affects people's choices.",
   "demographics": {
-    "collectAge": true,
-    "collectEducation": true
+    "collectAge": false,
+    "collectEducation": false
   },
   "experimentControl": {
-    "targetSampleSize": 150,
+    "targetSampleSize": 20,
     "conditions": {
-      "easy": 75,
-      "hard": 75
+      "easy": 10,
+      "hard": 10
     }
   }
 }

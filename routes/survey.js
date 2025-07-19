@@ -22,7 +22,36 @@ function getClientIP(req) {
          (req.connection.socket ? req.connection.socket.remoteAddress : null);
 }
 
-// Experiment selection page - handle both GET and POST
+// Dashboard as root page
+async function handleRootRequest(req, res) {
+  // Check if this is an experiment access with MTurk parameters
+  const { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (experiment && workerId && assignmentId && hitId) {
+    // Redirect to experiment start with parameters
+    return handleExperimentStart(req, res);
+  }
+  
+  // Show dashboard by default
+  try {
+    const experiments = ['font-pretest', 'novemsky2007', 'allais-paradox'];
+    const statusData = [];
+    
+    for (const experimentId of experiments) {
+      const status = await ExperimentControl.getExperimentStatus(experimentId);
+      if (status) {
+        statusData.push(status);
+      }
+    }
+    
+    res.render('dashboard', { experiments: statusData });
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    res.render('error', { message: 'Error loading dashboard' });
+  }
+}
+
+// Experiment start handler (separated from root)
 async function handleExperimentStart(req, res) {
   // Debug: log all parameters
   console.log('Query parameters:', req.query);
@@ -44,17 +73,10 @@ async function handleExperimentStart(req, res) {
   
   console.log('Extracted parameters:', { workerId, assignmentId, hitId, experiment, turkSubmitTo });
   
-  // If no experiment specified
+  // If no experiment specified, show error
   if (!experiment) {
-    // In development, show experiment selection
-    if (process.env.NODE_ENV !== 'production') {
-      const experiments = experimentLoader.getAvailableExperiments();
-      return res.render('experiment-selection', { experiments });
-    }
-    
-    // In production, require MTurk access
     return res.render('error', { 
-      message: 'This study must be accessed through Amazon Mechanical Turk. Please find our study on MTurk to participate.' 
+      message: 'This study must be accessed through Amazon Mechanical Turk with a valid experiment parameter.' 
     });
   }
 
@@ -131,6 +153,20 @@ async function handleExperimentStart(req, res) {
     req.session.attributionCondition = attributionCondition;
   }
 
+  // For multi-page experiments, go directly to experiment
+  const experimentConfig = experimentLoader.loadExperiment(experiment);
+  if (experimentConfig.multiPage) {
+    return res.render('experiment-multipage', { 
+      fontCondition: req.session.fontCondition,
+      attributionCondition: req.session.attributionCondition,
+      experiment: experimentConfig,
+      workerId: req.session.workerId,
+      assignmentId: req.session.assignmentId,
+      hitId: req.session.hitId,
+      turkSubmitTo: req.session.turkSubmitTo
+    });
+  }
+
   res.render('landing', { 
     workerId, 
     assignmentId, 
@@ -139,9 +175,9 @@ async function handleExperimentStart(req, res) {
   });
 }
 
-// Add both GET and POST routes for experiment start
-router.get('/', handleExperimentStart);
-router.post('/', handleExperimentStart);
+// Root route serves dashboard, with experiment access via parameters
+router.get('/', handleRootRequest);
+router.post('/', handleRootRequest);
 
 // Instructions page
 router.get('/instructions', async (req, res) => {
@@ -224,11 +260,24 @@ router.get('/experiment', (req, res) => {
   try {
     const experiment = experimentLoader.loadExperiment(req.session.experimentId);
     
-    res.render('experiment-dynamic', { 
-      fontCondition: req.session.fontCondition,
-      attributionCondition: req.session.attributionCondition,
-      experiment: experiment
-    });
+    // Use multi-page template for multi-page experiments
+    if (experiment.multiPage) {
+      res.render('experiment-multipage', { 
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        experiment: experiment,
+        workerId: req.session.workerId,
+        assignmentId: req.session.assignmentId,
+        hitId: req.session.hitId,
+        turkSubmitTo: req.session.turkSubmitTo
+      });
+    } else {
+      res.render('experiment-dynamic', { 
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        experiment: experiment
+      });
+    }
   } catch (error) {
     res.render('error', { 
       message: 'Error loading experiment configuration.' 
@@ -613,24 +662,9 @@ router.get('/status/:experimentId', async (req, res) => {
   }
 });
 
-// Experiment status dashboard
+// Experiment status dashboard (legacy route - now served from root)
 router.get('/dashboard', async (req, res) => {
-  try {
-    const experiments = ['font-pretest', 'novemsky2007', 'allais-paradox'];
-    const statusData = [];
-    
-    for (const experimentId of experiments) {
-      const status = await ExperimentControl.getExperimentStatus(experimentId);
-      if (status) {
-        statusData.push(status);
-      }
-    }
-    
-    res.render('dashboard', { experiments: statusData });
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    res.render('error', { message: 'Error loading dashboard' });
-  }
+  res.redirect('/');
 });
 
 // AMT HIT parameters endpoint
@@ -790,6 +824,94 @@ router.post('/reject-assignment', async (req, res) => {
   } catch (error) {
     console.error('Error rejecting assignment:', error);
     res.status(500).json({ error: 'Error rejecting assignment' });
+  }
+});
+
+// API endpoint for multi-page experiment submission
+router.post('/api/submit-multipage', async (req, res) => {
+  try {
+    const { workerId, assignmentId, hitId, experimentId, fontCondition, attributionCondition, responses, completionTimeMs, startTime, endTime } = req.body;
+    
+    if (!workerId || !assignmentId || !hitId || !experimentId || !responses) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    // Check for failures
+    let failed = false;
+    let failureReasons = [];
+    
+    // Validate attention check
+    const attentionCheck = experimentLoader.validateAttentionCheck(responses);
+    if (!attentionCheck.passed) {
+      console.log(`Attention check failed for worker ${workerId}:`, attentionCheck.message);
+      failed = true;
+      failureReasons.push('attention_check');
+    }
+    
+    // Check time limit (30 minutes = 1800000ms)
+    const timeLimit = 30 * 60 * 1000;
+    if (completionTimeMs && completionTimeMs > timeLimit) {
+      console.log(`Time limit exceeded for worker ${workerId}: ${Math.round(completionTimeMs/1000/60)} minutes`);
+      failed = true;
+      failureReasons.push('time_limit');
+    }
+    
+    if (failed) {
+      responses._failed = true;
+      responses._failureReasons = failureReasons;
+    }
+    
+    // Generate completion code
+    const completionCode = generateCompletionCode();
+    
+    // Create response document
+    const responseDoc = new Response({
+      workerId,
+      assignmentId,
+      hitId,
+      experimentId,
+      fontCondition,
+      attributionCondition,
+      choice: responses.lottery1 || 'N/A',
+      allResponses: {
+        lottery1: responses.lottery1,
+        lottery2: responses.lottery2,
+        math: responses.math,
+        _failed: responses._failed,
+        _failureReasons: responses._failureReasons,
+        completionTimeMs: completionTimeMs,
+        startTime: startTime,
+        endTime: endTime
+      },
+      completionCode,
+      ipAddress: getClientIP(req)
+    });
+    
+    await responseDoc.save();
+    console.log('Multi-page response saved:', responseDoc._id);
+    
+    // Update experiment control count
+    try {
+      const controlStatus = await ExperimentControl.incrementCount(experimentId, fontCondition);
+      
+      if (controlStatus && !controlStatus.isActive && controlStatus.completedAt) {
+        console.log(`Experiment ${experimentId} has reached target sample size.`);
+        await handleExperimentCompletion(hitId, experimentId, controlStatus.targetSampleSize);
+      }
+    } catch (error) {
+      console.error('Error updating experiment control:', error);
+    }
+    
+    res.json({ 
+      success: true, 
+      completionCode,
+      failed: failed,
+      failureReasons: failureReasons
+    });
+    
+  } catch (error) {
+    console.error('Error saving multi-page response:', error);
+    res.status(500).json({ error: 'Failed to save response' });
   }
 });
 

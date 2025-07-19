@@ -31,18 +31,23 @@ const responseSchema = new mongoose.Schema({
   },
   choice: {
     type: String,
-    required: true
+    required: false // Make optional for multi-page experiments
+  },
+  // For multi-page experiments, store all responses
+  allResponses: {
+    type: mongoose.Schema.Types.Mixed,
+    required: false
   },
   age: {
     type: Number,
-    required: true,
+    required: false,
     min: 18,
     max: 120
   },
   education: {
     type: String,
-    enum: ['high_school', 'some_college', 'bachelors', 'masters', 'doctorate'],
-    required: true
+    enum: ['less_than_hs', 'hs_diploma', 'some_college', 'associates', 'bachelors', 'masters', 'doctoral', 'professional', 'high_school', 'doctorate'],
+    required: false
   },
   readabilityRating: {
     type: Number,
