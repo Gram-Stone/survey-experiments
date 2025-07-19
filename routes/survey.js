@@ -494,11 +494,14 @@ router.get('/complete', async (req, res) => {
   }
   
   try {
+    // Check if this is a redirect from a completed multipage experiment
+    const isCompletedRedirect = req.query.completed === 'true';
+    
     // Get existing partial response from database (should exist from previous form submissions)
     let existingResponse = await Response.findOne({ workerId: req.session.workerId });
     
-    if (existingResponse && existingResponse.completionCode) {
-      // Worker has already completed - show error
+    if (existingResponse && existingResponse.completionCode && !isCompletedRedirect) {
+      // Worker has already completed - show error (unless this is a legitimate completion redirect)
       return res.render('error', { 
         message: 'You have already participated in one of our studies. Thank you for your interest, but you cannot participate in multiple studies.' 
       });
@@ -888,7 +891,7 @@ router.post('/api/submit-multipage', async (req, res) => {
     // Instead of JSON response, redirect to legacy completion page
     res.json({ 
       success: true, 
-      redirectTo: `/complete?workerId=${workerId}&assignmentId=${assignmentId}&hitId=${hitId}&experiment=${experimentId}`
+      redirectTo: `/complete?workerId=${workerId}&assignmentId=${assignmentId}&hitId=${hitId}&experiment=${experimentId}&completed=true`
     });
     
   } catch (error) {
