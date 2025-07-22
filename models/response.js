@@ -33,6 +33,14 @@ const responseSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  scenario1Choice: {
+    type: String,
+    required: false
+  },
+  scenario2Choice: {
+    type: String,
+    required: false
+  },
   age: {
     type: Number,
     required: true,

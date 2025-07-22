@@ -224,11 +224,19 @@ router.get('/experiment', (req, res) => {
   try {
     const experiment = experimentLoader.loadExperiment(req.session.experimentId);
     
-    res.render('experiment-dynamic', { 
-      fontCondition: req.session.fontCondition,
-      attributionCondition: req.session.attributionCondition,
-      experiment: experiment
-    });
+    // Use scenario1 template for Allais paradox, experiment-dynamic for others
+    if (req.session.experimentId === 'allais-paradox') {
+      res.render('scenario1', { 
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition
+      });
+    } else {
+      res.render('experiment-dynamic', { 
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        experiment: experiment
+      });
+    }
   } catch (error) {
     res.render('error', { 
       message: 'Error loading experiment configuration.' 
@@ -272,38 +280,61 @@ router.post('/experiment', async (req, res) => {
     return res.redirect('/');
   }
   
-  const { choice } = req.body;
+  const { choice, scenario1Choice } = req.body;
   const experimentConfig = experimentLoader.loadExperiment(req.session.experimentId);
-  const validChoices = experimentLoader.getValidChoices(req.session.experimentId);
   
-  if (!choice || !validChoices.includes(choice)) {
-    return res.render('experiment-dynamic', { 
-      fontCondition: req.session.fontCondition,
-      attributionCondition: req.session.attributionCondition,
-      experiment: experimentConfig,
-      error: 'Please select an option before continuing.'
-    });
+  // Handle Allais paradox scenario 1
+  if (req.session.experimentId === 'allais-paradox') {
+    if (!scenario1Choice) {
+      return res.render('scenario1', { 
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        error: 'Please select an option before continuing.'
+      });
+    }
+    
+    req.session.scenario1Choice = scenario1Choice;
+    req.session.choice = scenario1Choice; // For compatibility
+  } else {
+    // Handle other experiments
+    const validChoices = experimentLoader.getValidChoices(req.session.experimentId);
+    
+    if (!choice || !validChoices.includes(choice)) {
+      return res.render('experiment-dynamic', { 
+        fontCondition: req.session.fontCondition,
+        attributionCondition: req.session.attributionCondition,
+        experiment: experimentConfig,
+        error: 'Please select an option before continuing.'
+      });
+    }
+    
+    req.session.choice = choice;
   }
-  
-  req.session.choice = choice;
   
   // Store choice in database immediately to survive session loss
   try {
+    const updateData = {
+      workerId: req.session.workerId,
+      assignmentId: req.session.assignmentId,
+      hitId: req.session.hitId,
+      experimentId: req.session.experimentId,
+      fontCondition: req.session.fontCondition,
+      attributionCondition: req.session.attributionCondition,
+      choice: req.session.choice,
+      ipAddress: getClientIP(req)
+    };
+    
+    // Add scenario-specific data for Allais paradox
+    if (req.session.experimentId === 'allais-paradox') {
+      updateData.scenario1Choice = req.session.scenario1Choice;
+    }
+    
     await Response.findOneAndUpdate(
       { workerId: req.session.workerId },
-      { 
-        workerId: req.session.workerId,
-        assignmentId: req.session.assignmentId,
-        hitId: req.session.hitId,
-        experimentId: req.session.experimentId,
-        fontCondition: req.session.fontCondition,
-        attributionCondition: req.session.attributionCondition,
-        choice: choice,
-        ipAddress: getClientIP(req)
-      },
+      updateData,
       { upsert: true, new: true }
     );
-    console.log('Saved choice to database:', choice);
+    console.log('Saved choice to database:', req.session.choice);
   } catch (error) {
     console.error('Error saving choice:', error);
   }
@@ -420,10 +451,130 @@ router.post('/demographics', async (req, res) => {
   
   // Preserve URL parameters in redirect
   const queryString = new URLSearchParams(req.query).toString();
+  
+  // For Allais paradox, go to scenario 2; for others, go to complete
+  if (req.session.experimentId === 'allais-paradox') {
+    const redirectUrl = queryString ? `/scenario2?${queryString}` : '/scenario2';
+    res.redirect(redirectUrl);
+  } else {
+    const redirectUrl = queryString ? `/complete?${queryString}` : '/complete';
+    res.redirect(redirectUrl);
+  }
+});
+
+// Scenario 2 page (for Allais paradox)
+router.get('/scenario2', (req, res) => {
+  console.log('Scenario2 page - URL params:', req.query);
+  console.log('Scenario2 page - Session data:', {
+    sessionId: req.sessionID,
+    workerId: req.session.workerId,
+    experimentId: req.session.experimentId,
+    scenario1Choice: req.session.scenario1Choice
+  });
+  
+  // Try to get parameters from URL if session is empty
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (!req.session.workerId && workerId && assignmentId && hitId && experiment) {
+    console.log('Scenario2 session empty, reinitializing from URL parameters');
+    
+    // Reinitialize session from URL parameters
+    req.session.workerId = workerId;
+    req.session.assignmentId = assignmentId;
+    req.session.hitId = hitId;
+    req.session.experimentId = experiment;
+    req.session.turkSubmitTo = turkSubmitTo;
+    
+    // Only assign font/attribution conditions for fluency intervention experiments
+    if (experiment !== 'font-pretest') {
+      const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+      req.session.fontCondition = fontCondition;
+      req.session.attributionCondition = attributionCondition;
+    }
+  }
+  
+  if (!req.session.workerId || req.session.experimentId !== 'allais-paradox') {
+    console.log('No workerId or not allais-paradox experiment, redirecting to home');
+    return res.redirect('/');
+  }
+  
+  res.render('scenario2', { 
+    fontCondition: req.session.fontCondition,
+    attributionCondition: req.session.attributionCondition
+  });
+});
+
+// Handle scenario 2 form submission
+router.post('/scenario2', async (req, res) => {
+  console.log('POST /scenario2 - URL params:', req.query);
+  console.log('POST /scenario2 - Session data:', {
+    sessionId: req.sessionID,
+    workerId: req.session.workerId,
+    experimentId: req.session.experimentId,
+    scenario1Choice: req.session.scenario1Choice
+  });
+  
+  // Try to get parameters from URL if session is empty
+  let { workerId, assignmentId, hitId, experiment, turkSubmitTo } = req.query;
+  
+  if (!req.session.workerId && workerId && assignmentId && hitId && experiment) {
+    console.log('POST scenario2 session empty, reinitializing from URL parameters');
+    
+    // Reinitialize session from URL parameters
+    req.session.workerId = workerId;
+    req.session.assignmentId = assignmentId;
+    req.session.hitId = hitId;
+    req.session.experimentId = experiment;
+    req.session.turkSubmitTo = turkSubmitTo;
+    
+    // Only assign font/attribution conditions for fluency intervention experiments
+    if (experiment !== 'font-pretest') {
+      const fontCondition = Math.random() < 0.5 ? 'easy' : 'hard';
+      const attributionCondition = Math.random() < 0.5 ? 'present' : 'absent';
+      req.session.fontCondition = fontCondition;
+      req.session.attributionCondition = attributionCondition;
+    }
+  }
+  
+  if (!req.session.workerId || req.session.experimentId !== 'allais-paradox') {
+    console.log('No workerId or not allais-paradox experiment in POST scenario2, redirecting to home');
+    return res.redirect('/');
+  }
+  
+  const { scenario2Choice } = req.body;
+  
+  if (!scenario2Choice) {
+    return res.render('scenario2', { 
+      fontCondition: req.session.fontCondition,
+      attributionCondition: req.session.attributionCondition,
+      error: 'Please select an option before continuing.'
+    });
+  }
+  
+  req.session.scenario2Choice = scenario2Choice;
+  req.session.choice = `${req.session.scenario1Choice},${scenario2Choice}`; // Combined for legacy compatibility
+  
+  // Store scenario 2 choice in database immediately
+  try {
+    await Response.findOneAndUpdate(
+      { workerId: req.session.workerId },
+      { 
+        scenario2Choice: scenario2Choice,
+        choice: req.session.choice
+      },
+      { upsert: true, new: true }
+    );
+    console.log('Saved scenario 2 choice to database:', scenario2Choice);
+  } catch (error) {
+    console.error('Error saving scenario 2 choice:', error);
+  }
+  
+  // Preserve URL parameters in redirect
+  const queryString = new URLSearchParams(req.query).toString();
   const redirectUrl = queryString ? `/complete?${queryString}` : '/complete';
   res.redirect(redirectUrl);
 });
-
 
 // Completion page
 router.get('/complete', async (req, res) => {

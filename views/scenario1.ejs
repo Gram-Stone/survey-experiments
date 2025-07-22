@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychology Research Study - Decision Task</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="<%= typeof fontCondition !== 'undefined' ? 'body-' + fontCondition + '-font' : '' %>">
+    <div class="container">
+        <header>
+            <h1>Psychology Research Study</h1>
+        </header>
+        
+        <main>
+            <div class="experiment-section">
+                <h2>Decision Task</h2>
+                
+                <% if (typeof error !== 'undefined') { %>
+                    <div class="error-message">
+                        <%= error %>
+                    </div>
+                <% } %>
+                
+                <div class="decision-description">
+                    <p class="<%= fontCondition %>-font">Please read the following decision carefully and choose the option you would prefer:</p>
+                    <% if (attributionCondition === 'present' && fontCondition === 'hard') { %>
+                        <p class="attribution-note"><em>Note: This information may be difficult to read because of the font.</em></p>
+                    <% } %>
+                </div>
+                
+                <form method="POST" action="/experiment">
+                    <div class="decision-content">
+                        <h3 class="<%= fontCondition %>-font">Financial Decision</h3>
+                        
+                        <div class="decision-text <%= fontCondition %>-font">
+                            <p>Imagine you are faced with the following choice. Please select the option you would prefer:</p>
+                        </div>
+                        
+                        <div class="options-container">
+                            <div class="option-box">
+                                <label for="optionA" class="option-label">
+                                    <input type="radio" id="optionA" name="scenario1Choice" value="A">
+                                    <div class="option-content <%= fontCondition %>-font">
+                                        <h4>Option A</h4>
+                                        <p>$2,400 for certain</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="option-box">
+                                <label for="optionB" class="option-label">
+                                    <input type="radio" id="optionB" name="scenario1Choice" value="B">
+                                    <div class="option-content <%= fontCondition %>-font">
+                                        <h4>Option B</h4>
+                                        <p>33% chance of $2,500</p>
+                                        <p>66% chance of $2,400</p>
+                                        <p>1% chance of $0</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="option-box defer-option">
+                                <label for="optionDefer" class="option-label">
+                                    <input type="radio" id="optionDefer" name="scenario1Choice" value="DEFER">
+                                    <div class="option-content">
+                                        <h4>Continue Looking</h4>
+                                        <p>I would like to see more options before deciding</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="question-text <%= fontCondition %>-font">
+                            <p><strong>Which option would you prefer?</strong></p>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button type="submit" class="btn btn-primary">Continue</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+        <footer>
+            <p>All responses are confidential.</p>
+        </footer>
+    </div>
+</body>
+</html>

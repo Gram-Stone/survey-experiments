@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Psychology Research Study - Decision Task</title>
+    <title>Psychology Research Study - Second Decision</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body class="<%= typeof fontCondition !== 'undefined' ? 'body-' + fontCondition + '-font' : '' %>">
@@ -14,7 +14,7 @@
         
         <main>
             <div class="experiment-section">
-                <h2>Decision Task</h2>
+                <h2>Second Decision Task</h2>
                 
                 <% if (typeof error !== 'undefined') { %>
                     <div class="error-message">
@@ -29,40 +29,40 @@
                     <% } %>
                 </div>
                 
-                <form method="POST" action="/experiment">
+                <form method="POST" action="/scenario2">
                     <div class="decision-content">
-                        <h3 class="<%= fontCondition %>-font">Financial Decision</h3>
+                        <h3 class="<%= fontCondition %>-font">Financial Decision - Scenario 2</h3>
                         
                         <div class="decision-text <%= fontCondition %>-font">
-                            <p>Imagine you are faced with the following choice. Please select the option you would prefer:</p>
+                            <p>Now imagine you are faced with a different choice. Please select the option you would prefer:</p>
                         </div>
                         
                         <div class="options-container">
                             <div class="option-box">
-                                <label for="optionA" class="option-label">
-                                    <input type="radio" id="optionA" name="allaisChoice" value="A">
+                                <label for="optionC" class="option-label">
+                                    <input type="radio" id="optionC" name="scenario2Choice" value="C">
                                     <div class="option-content <%= fontCondition %>-font">
-                                        <h4>Option A</h4>
-                                        <p>$2,400 for certain</p>
+                                        <h4>Option C</h4>
+                                        <p>33% chance of $2,500</p>
+                                        <p>67% chance of $0</p>
                                     </div>
                                 </label>
                             </div>
                             
                             <div class="option-box">
-                                <label for="optionB" class="option-label">
-                                    <input type="radio" id="optionB" name="allaisChoice" value="B">
+                                <label for="optionD" class="option-label">
+                                    <input type="radio" id="optionD" name="scenario2Choice" value="D">
                                     <div class="option-content <%= fontCondition %>-font">
-                                        <h4>Option B</h4>
-                                        <p>33% chance of $2,500</p>
-                                        <p>66% chance of $2,400</p>
-                                        <p>1% chance of $0</p>
+                                        <h4>Option D</h4>
+                                        <p>34% chance of $2,400</p>
+                                        <p>66% chance of $0</p>
                                     </div>
                                 </label>
                             </div>
                             
                             <div class="option-box defer-option">
                                 <label for="optionDefer" class="option-label">
-                                    <input type="radio" id="optionDefer" name="allaisChoice" value="DEFER">
+                                    <input type="radio" id="optionDefer" name="scenario2Choice" value="DEFER">
                                     <div class="option-content">
                                         <h4>Continue Looking</h4>
                                         <p>I would like to see more options before deciding</p>

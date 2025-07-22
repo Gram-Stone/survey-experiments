@@ -385,6 +385,136 @@ async function analyzeExperiment(experimentId) {
   };
 }
 
+// Allais Paradox specific analysis
+async function analyzeAllaisParadox() {
+  const data = await Response.find({ experimentId: 'allais-paradox' });
+  
+  console.log('\n=== ALLAIS PARADOX ANALYSIS ===');
+  console.log(`Total participants: ${data.length}`);
+  
+  if (data.length === 0) {
+    console.log('No Allais paradox data found');
+    return;
+  }
+  
+  // Filter out participants who didn't complete both scenarios
+  const completeData = data.filter(r => r.scenario1Choice && r.scenario2Choice);
+  console.log(`Complete responses (both scenarios): ${completeData.length}`);
+  
+  if (completeData.length === 0) {
+    console.log('No complete two-scenario responses found');
+    return;
+  }
+  
+  // Scenario 1 analysis
+  console.log('\n--- SCENARIO 1 ANALYSIS ---');
+  console.log('Choice: $2,400 certain (A) vs. 33% chance $2,500, 66% chance $2,400, 1% chance $0 (B)');
+  
+  const scenario1Counts = { A: 0, B: 0, DEFER: 0 };
+  completeData.forEach(r => {
+    scenario1Counts[r.scenario1Choice]++;
+  });
+  
+  const s1Total = completeData.length;
+  console.log(`Option A (certain): ${scenario1Counts.A} (${(scenario1Counts.A/s1Total*100).toFixed(1)}%)`);
+  console.log(`Option B (lottery): ${scenario1Counts.B} (${(scenario1Counts.B/s1Total*100).toFixed(1)}%)`);
+  if (scenario1Counts.DEFER > 0) {
+    console.log(`Defer: ${scenario1Counts.DEFER} (${(scenario1Counts.DEFER/s1Total*100).toFixed(1)}%)`);
+  }
+  
+  // Scenario 2 analysis
+  console.log('\n--- SCENARIO 2 ANALYSIS ---');
+  console.log('Choice: 33% chance $2,500, 67% chance $0 (C) vs. 34% chance $2,400, 66% chance $0 (D)');
+  
+  const scenario2Counts = { C: 0, D: 0, DEFER: 0 };
+  completeData.forEach(r => {
+    scenario2Counts[r.scenario2Choice]++;
+  });
+  
+  const s2Total = completeData.length;
+  console.log(`Option C (lottery): ${scenario2Counts.C} (${(scenario2Counts.C/s2Total*100).toFixed(1)}%)`);
+  console.log(`Option D (lottery): ${scenario2Counts.D} (${(scenario2Counts.D/s2Total*100).toFixed(1)}%)`);
+  if (scenario2Counts.DEFER > 0) {
+    console.log(`Defer: ${scenario2Counts.DEFER} (${(scenario2Counts.DEFER/s2Total*100).toFixed(1)}%)`);
+  }
+  
+  // Allais paradox pattern analysis (exclude defers)
+  const choiceData = completeData.filter(r => r.scenario1Choice !== 'DEFER' && r.scenario2Choice !== 'DEFER');
+  if (choiceData.length > 0) {
+    console.log('\n--- ALLAIS PARADOX PATTERN ANALYSIS ---');
+    console.log(`Participants who made choices in both scenarios: ${choiceData.length}`);
+    
+    const patterns = {
+      'A,C': 0,  // Paradox pattern: safe then risky (violates expected utility)
+      'A,D': 0,  // Consistent risk averse
+      'B,C': 0,  // Consistent risk seeking
+      'B,D': 0   // Anti-paradox: risky then safe
+    };
+    
+    choiceData.forEach(r => {
+      const pattern = `${r.scenario1Choice},${r.scenario2Choice}`;
+      if (patterns.hasOwnProperty(pattern)) {
+        patterns[pattern]++;
+      }
+    });
+    
+    console.log('\nChoice patterns:');
+    console.log(`A,C (Allais paradox): ${patterns['A,C']} (${(patterns['A,C']/choiceData.length*100).toFixed(1)}%)`);
+    console.log(`A,D (consistent safe): ${patterns['A,D']} (${(patterns['A,D']/choiceData.length*100).toFixed(1)}%)`);
+    console.log(`B,C (consistent risky): ${patterns['B,C']} (${(patterns['B,C']/choiceData.length*100).toFixed(1)}%)`);
+    console.log(`B,D (reverse paradox): ${patterns['B,D']} (${(patterns['B,D']/choiceData.length*100).toFixed(1)}%)`);
+    
+    const paradoxRate = patterns['A,C'] / choiceData.length;
+    const consistentRate = (patterns['A,D'] + patterns['B,C']) / choiceData.length;
+    
+    console.log(`\nParadox rate: ${(paradoxRate*100).toFixed(1)}%`);
+    console.log(`Consistent rate: ${(consistentRate*100).toFixed(1)}%`);
+  }
+  
+  // Font condition analysis for two-scenario Allais
+  const byFont = { easy: [], hard: [] };
+  completeData.forEach(r => {
+    if (r.fontCondition === 'easy' || r.fontCondition === 'hard') {
+      byFont[r.fontCondition].push(r);
+    }
+  });
+  
+  if (byFont.easy.length > 0 && byFont.hard.length > 0) {
+    console.log('\n--- FONT CONDITION EFFECTS ---');
+    
+    ['easy', 'hard'].forEach(font => {
+      const fontData = byFont[font];
+      const choicesOnly = fontData.filter(r => r.scenario1Choice !== 'DEFER' && r.scenario2Choice !== 'DEFER');
+      
+      if (choicesOnly.length > 0) {
+        const paradoxCount = choicesOnly.filter(r => r.scenario1Choice === 'A' && r.scenario2Choice === 'C').length;
+        const paradoxRate = paradoxCount / choicesOnly.length;
+        
+        console.log(`${font} font: ${paradoxCount}/${choicesOnly.length} paradox pattern (${(paradoxRate*100).toFixed(1)}%)`);
+      }
+    });
+    
+    // Deferral analysis by scenario and font
+    console.log('\n--- DEFERRAL BY SCENARIO AND FONT ---');
+    ['easy', 'hard'].forEach(font => {
+      const fontData = byFont[font];
+      
+      const s1Defers = fontData.filter(r => r.scenario1Choice === 'DEFER').length;
+      const s2Defers = fontData.filter(r => r.scenario2Choice === 'DEFER').length;
+      
+      console.log(`${font} font scenario 1 deferrals: ${s1Defers}/${fontData.length} (${(s1Defers/fontData.length*100).toFixed(1)}%)`);
+      console.log(`${font} font scenario 2 deferrals: ${s2Defers}/${fontData.length} (${(s2Defers/fontData.length*100).toFixed(1)}%)`);
+    });
+  }
+  
+  return {
+    totalParticipants: data.length,
+    completeResponses: completeData.length,
+    scenario1Counts,
+    scenario2Counts
+  };
+}
+
 // Export data to CSV
 async function exportData(experimentId = null) {
   const query = experimentId ? { experimentId } : {};
@@ -396,8 +526,8 @@ async function exportData(experimentId = null) {
   // Header
   const headers = [
     'workerId', 'experimentId', 'fontCondition', 'attributionCondition', 
-    'choice', 'age', 'education', 'readabilityRating', 'completionCode', 
-    'createdAt'
+    'choice', 'scenario1Choice', 'scenario2Choice', 'age', 'education', 
+    'readabilityRating', 'completionCode', 'createdAt'
   ];
   console.log(headers.join(','));
   
@@ -409,6 +539,8 @@ async function exportData(experimentId = null) {
       response.fontCondition,
       response.attributionCondition,
       response.choice,
+      response.scenario1Choice || '',
+      response.scenario2Choice || '',
       response.age,
       response.education,
       response.readabilityRating,
@@ -426,12 +558,20 @@ async function runAnalysis(options = {}) {
   try {
     if (options.experiment) {
       await analyzeExperiment(options.experiment);
+      // Run Allais-specific analysis if requested
+      if (options.experiment === 'allais-paradox') {
+        await analyzeAllaisParadox();
+      }
     } else {
       // Analyze all experiments if none specified
       const experiments = ['font-pretest', 'novemsky2007', 'allais-paradox'];
       for (const exp of experiments) {
         try {
           await analyzeExperiment(exp);
+          // Run Allais-specific analysis for allais-paradox
+          if (exp === 'allais-paradox') {
+            await analyzeAllaisParadox();
+          }
         } catch (error) {
           console.log(`\nSkipping ${exp}: ${error.message}`);
         }
@@ -472,7 +612,8 @@ export {
   calculatePower,
   chiSquareTest,
   pairedTTest,
-  analyzeExperiment, 
+  analyzeExperiment,
+  analyzeAllaisParadox,
   exportData, 
   runAnalysis,
   getRecommendedSampleSize
