@@ -92,6 +92,34 @@ li {
     text-shadow: 2.25px 1.75px 0px #aaa, 3px 2.5px 1px rgba(170,170,170,0.3);
 }
 
+/* Body-level font conditions - Apply to entire page when condition is active */
+.body-easy-font {
+    font-family: 'Times New Roman', serif;
+    color: #000;
+    line-height: 1.6;
+}
+
+.body-hard-font * {
+    font-family: 'Times New Roman', serif !important;
+    color: #333 !important;
+    font-style: italic !important;
+    text-shadow: 2.25px 1.75px 0px #aaa, 3px 2.5px 1px rgba(170,170,170,0.3) !important;
+}
+
+/* Preserve button and form styling in hard font condition */
+.body-hard-font .btn,
+.body-hard-font input[type="text"],
+.body-hard-font input[type="number"],
+.body-hard-font select {
+    font-style: normal !important;
+    text-shadow: none !important;
+    color: #333 !important;
+}
+
+.body-hard-font .btn {
+    color: white !important;
+}
+
 /* Form Styles */
 form {
     margin-bottom: 20px;
